@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AssociationController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CampaignController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -33,6 +34,21 @@ Route::post('/associations', [AssociationController::class, 'store'])
 
 Route::get('/associations/{association}', [AssociationController::class, 'show'])
     ->name('associations.show');
+
+// Routes Campaigns
+Route::get('/campaigns', [CampaignController::class, 'index'])
+    ->name('campaigns.index');
+
+Route::get('/campaigns/create', [CampaignController::class, 'create'])
+    ->name('campaigns.create')
+    ->middleware('auth');
+
+Route::post('/campaigns', [CampaignController::class, 'store'])
+    ->name('campaigns.store')
+    ->middleware('auth');
+
+Route::get('/campaigns/{campaign}', [CampaignController::class, 'show'])
+    ->name('campaigns.show');
 
 // Routes Admin
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
