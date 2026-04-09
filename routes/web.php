@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AssociationController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CampaignController;
+use App\Http\Controllers\BesoinController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -49,6 +50,14 @@ Route::post('/campaigns', [CampaignController::class, 'store'])
 
 Route::get('/campaigns/{campaign}', [CampaignController::class, 'show'])
     ->name('campaigns.show');
+
+// Routes Besoins (accessible sans connexion)
+Route::get('/besoins/create', [BesoinController::class, 'create'])
+    ->name('besoins.create');
+Route::post('/besoins', [BesoinController::class, 'store'])
+    ->name('besoins.store');
+Route::get('/besoins/confirmation', [BesoinController::class, 'confirmation'])
+    ->name('besoins.confirmation');
 
 // Routes Admin
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
