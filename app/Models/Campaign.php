@@ -32,6 +32,12 @@ class Campaign extends Model
         return $this->belongsTo(Association::class);
     }
 
+    // Relation avec Donations
+    public function donations()
+    {
+        return $this->hasMany(Donation::class);
+    }
+
     // Pourcentage de progression
     public function progressPercentage()
     {

@@ -52,7 +52,7 @@
                 <!-- Bouton Don -->
                 @auth
                     @if(auth()->user()->isDonateur())
-                        <a href="#"
+                        <a href="{{ route('donations.create', $campaign) }}"
                             class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 inline-block mb-4">
                             💚 Faire un don
                         </a>

@@ -5,6 +5,7 @@ use App\Http\Controllers\AssociationController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\BesoinController;
+use App\Http\Controllers\DonationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -58,6 +59,16 @@ Route::post('/besoins', [BesoinController::class, 'store'])
     ->name('besoins.store');
 Route::get('/besoins/confirmation', [BesoinController::class, 'confirmation'])
     ->name('besoins.confirmation');
+
+// Routes Donations
+Route::middleware(['auth'])->group(function () {
+    Route::get('/campaigns/{campaign}/donate', [DonationController::class, 'create'])
+        ->name('donations.create');
+    Route::post('/campaigns/{campaign}/donate', [DonationController::class, 'store'])
+        ->name('donations.store');
+    Route::get('/donations/historique', [DonationController::class, 'historique'])
+        ->name('donations.historique');
+});
 
 // Routes Admin
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
