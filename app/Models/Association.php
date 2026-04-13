@@ -29,6 +29,12 @@ class Association extends Model
         return $this->belongsTo(User::class);
     }
 
+    // Relation avec Campaigns
+    public function campaigns()
+    {
+        return $this->hasMany(Campaign::class);
+    }
+
     // Scopes
     public function scopeValidees($query)
     {
