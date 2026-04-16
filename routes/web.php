@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\BesoinController;
 use App\Http\Controllers\DonationController;
+use App\Http\Controllers\TacheController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -25,30 +26,20 @@ Route::middleware('auth')->group(function () {
 // Routes Associations
 Route::get('/associations', [AssociationController::class, 'index'])
     ->name('associations.index');
-
 Route::get('/associations/create', [AssociationController::class, 'create'])
-    ->name('associations.create')
-    ->middleware('auth');
-
+    ->name('associations.create')->middleware('auth');
 Route::post('/associations', [AssociationController::class, 'store'])
-    ->name('associations.store')
-    ->middleware('auth');
-
+    ->name('associations.store')->middleware('auth');
 Route::get('/associations/{association}', [AssociationController::class, 'show'])
     ->name('associations.show');
 
 // Routes Campaigns
 Route::get('/campaigns', [CampaignController::class, 'index'])
     ->name('campaigns.index');
-
 Route::get('/campaigns/create', [CampaignController::class, 'create'])
-    ->name('campaigns.create')
-    ->middleware('auth');
-
+    ->name('campaigns.create')->middleware('auth');
 Route::post('/campaigns', [CampaignController::class, 'store'])
-    ->name('campaigns.store')
-    ->middleware('auth');
-
+    ->name('campaigns.store')->middleware('auth');
 Route::get('/campaigns/{campaign}', [CampaignController::class, 'show'])
     ->name('campaigns.show');
 
@@ -68,6 +59,22 @@ Route::middleware(['auth'])->group(function () {
         ->name('donations.store');
     Route::get('/donations/historique', [DonationController::class, 'historique'])
         ->name('donations.historique');
+});
+
+// Routes Taches (Module Bénévolat)
+Route::get('/taches', [TacheController::class, 'index'])
+    ->name('taches.index');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/taches/mes-taches', [TacheController::class, 'mes_taches'])
+        ->name('taches.mes_taches');
+    Route::get('/taches/create', [TacheController::class, 'create'])
+        ->name('taches.create');
+    Route::post('/taches', [TacheController::class, 'store'])
+        ->name('taches.store');
+    Route::post('/taches/{tache}/postuler', [TacheController::class, 'postuler'])
+        ->name('taches.postuler');
+    Route::post('/taches/{tache}/compte-rendu', [TacheController::class, 'compte_rendu'])
+        ->name('taches.compte_rendu');
 });
 
 // Routes Admin
