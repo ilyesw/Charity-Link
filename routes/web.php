@@ -7,7 +7,9 @@ use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\BesoinController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\TacheController;
+use App\Http\Controllers\ChatbotController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -78,13 +80,31 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Routes Admin
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', [AdminController::class, 'index'])
-        ->name('index');
-    Route::post('/associations/{association}/valider', [AdminController::class, 'validerAssociation'])
-        ->name('associations.valider');
-    Route::post('/associations/{association}/rejeter', [AdminController::class, 'rejeterAssociation'])
-        ->name('associations.rejeter');
+Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/', [AdminController::class, 'index'])
+            ->name('index');
+        Route::post('/associations/{association}/valider', [AdminController::class, 'validerAssociation'])
+            ->name('associations.valider');
+        Route::post('/associations/{association}/rejeter', [AdminController::class, 'rejeterAssociation'])
+            ->name('associations.rejeter');
+    });
+
+// Routes Chatbot
+Route::get('/chatbot', [ChatbotController::class, 'index'])
+    ->name('chatbot.index');
+Route::post('/chatbot/chat', [ChatbotController::class, 'chat'])
+    ->name('chatbot.chat');
+
+
+// Routes Notifications
+Route::middleware(['auth'])->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index'])
+        ->name('notifications.index');
+    Route::get('/notifications/count', [NotificationController::class, 'count'])
+        ->name('notifications.count');
 });
 
 require __DIR__.'/auth.php';

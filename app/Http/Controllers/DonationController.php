@@ -6,16 +6,15 @@ use App\Models\Donation;
 use App\Models\Campaign;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Helpers\NotificationHelper;
 
 class DonationController extends Controller
 {
-    // Formulaire don
     public function create(Campaign $campaign)
     {
         return view('donations.create', compact('campaign'));
     }
 
-    // Sauvegarder le don
     public function store(Request $request, Campaign $campaign)
     {
         $request->validate([
@@ -30,18 +29,14 @@ class DonationController extends Controller
             'status'      => 'confirme',
         ];
 
-        // Don financier
         if ($request->type === 'financier') {
             $request->validate([
                 'amount' => ['required', 'numeric', 'min:1'],
             ]);
             $data['amount'] = $request->amount;
-
-            // Mise à jour progression campagne
             $campaign->increment('current_amount', $request->amount);
         }
 
-        // Don en nature
         if ($request->type === 'nature') {
             $request->validate([
                 'category'       => ['required', 'in:vetements,nourriture,medicaments,scolaire'],
@@ -53,7 +48,6 @@ class DonationController extends Controller
             $data['pickup_address'] = $request->pickup_address;
         }
 
-        // Don de compétences
         if ($request->type === 'competences') {
             $request->validate([
                 'competence'      => ['required', 'string', 'max:255'],
@@ -67,11 +61,27 @@ class DonationController extends Controller
 
         Donation::create($data);
 
+        // Notifier le donateur
+        NotificationHelper::donEffectue(
+            Auth::id(),
+            $campaign->title,
+            $request->type
+        );
+
+        // Notifier l'association
+        $association = $campaign->association;
+        NotificationHelper::send(
+            $association->user_id,
+            '💰 Nouveau don reçu !',
+            "Vous avez reçu un don ({$request->type}) pour votre campagne \"{$campaign->title}\".",
+            'don',
+            '/dashboard'
+        );
+
         return redirect()->route('campaigns.show', $campaign)
             ->with('success', 'Don effectué avec succès ! Merci pour votre générosité !');
     }
 
-    // Historique des dons
     public function historique()
     {
         $donations = Donation::where('user_id', Auth::id())

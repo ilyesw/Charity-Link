@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Tache;
 use App\Models\Association;
+use App\Helpers\NotificationHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class TacheController extends Controller
 {
-    // Liste des tâches ouvertes (pour bénévoles)
     public function index()
     {
         $taches = Tache::ouverte()
@@ -20,7 +20,6 @@ class TacheController extends Controller
         return view('taches.index', compact('taches'));
     }
 
-    // Créer une tâche (association)
     public function create()
     {
         $association = Association::where('user_id', Auth::id())
@@ -35,7 +34,6 @@ class TacheController extends Controller
         return view('taches.create', compact('association'));
     }
 
-    // Sauvegarder la tâche
     public function store(Request $request)
     {
         $request->validate([
@@ -62,24 +60,37 @@ class TacheController extends Controller
             ->with('success', 'Tâche créée avec succès !');
     }
 
-    // Bénévole prend une tâche
-    public function postuler(Tache $tache)
-    {
-        if ($tache->status !== 'ouverte') {
-            return redirect()->back()
-                ->with('error', 'Cette tâche n\'est plus disponible.');
-        }
-
-        $tache->update([
-            'benevole_id' => Auth::id(),
-            'status'      => 'en_cours',
-        ]);
-
-        return redirect()->route('taches.mes_taches')
-            ->with('success', 'Vous avez accepté cette tâche !');
+public function postuler(Tache $tache)
+{
+    if ($tache->status !== 'ouverte') {
+        return redirect()->back()
+            ->with('error', 'Cette tâche n\'est plus disponible.');
     }
 
-    // Mes tâches (bénévole)
+    $tache->update([
+        'benevole_id' => Auth::id(),
+        'status'      => 'en_cours',
+    ]);
+
+    // Notifier le bénévole
+    NotificationHelper::tacheAssignee(
+        Auth::id(),
+        $tache->title
+    );
+
+    // Notifier l'association
+    NotificationHelper::send(
+        $tache->association->user_id,
+        '🤝 Bénévole assigné !',
+        "Un bénévole a accepté votre tâche \"{$tache->title}\".",
+        'tache',
+        '/dashboard'
+    );
+
+    return redirect()->route('taches.mes_taches')
+        ->with('success', 'Vous avez accepté cette tâche !');
+}
+
     public function mes_taches()
     {
         $taches = Tache::where('benevole_id', Auth::id())
@@ -90,7 +101,6 @@ class TacheController extends Controller
         return view('taches.mes_taches', compact('taches'));
     }
 
-    // Soumettre compte rendu (bénévole)
     public function compte_rendu(Request $request, Tache $tache)
     {
         $request->validate([

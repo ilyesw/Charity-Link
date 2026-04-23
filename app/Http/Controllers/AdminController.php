@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Association;
 use App\Models\User;
+use App\Helpers\NotificationHelper;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    // Dashboard Admin
     public function index()
     {
         $stats = [
@@ -26,16 +26,20 @@ class AdminController extends Controller
         return view('admin.index', compact('stats', 'associations_en_attente'));
     }
 
-    // Valider une association
     public function validerAssociation(Association $association)
     {
         $association->update(['status' => 'validee']);
+
+        // Notifier l'association
+        NotificationHelper::associationValidee(
+            $association->user_id,
+            $association->name
+        );
 
         return redirect()->route('admin.index')
             ->with('success', 'Association validée avec succès !');
     }
 
-    // Rejeter une association
     public function rejeterAssociation(Request $request, Association $association)
     {
         $request->validate([
@@ -46,6 +50,12 @@ class AdminController extends Controller
             'status'           => 'rejetee',
             'rejection_reason' => $request->rejection_reason,
         ]);
+
+        // Notifier l'association
+        NotificationHelper::associationRejetee(
+            $association->user_id,
+            $association->name
+        );
 
         return redirect()->route('admin.index')
             ->with('success', 'Association rejetée.');
