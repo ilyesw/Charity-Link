@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class CampaignController extends Controller
 {
-    // Liste des campagnes
     public function index()
     {
         $campaigns = Campaign::active()
@@ -20,13 +19,11 @@ class CampaignController extends Controller
         return view('campaigns.index', compact('campaigns'));
     }
 
-    // Détail d'une campagne
     public function show(Campaign $campaign)
     {
         return view('campaigns.show', compact('campaign'));
     }
 
-    // Formulaire création campagne
     public function create()
     {
         $association = Association::where('user_id', Auth::id())
@@ -41,7 +38,6 @@ class CampaignController extends Controller
         return view('campaigns.create', compact('association'));
     }
 
-    // Sauvegarder la campagne
     public function store(Request $request)
     {
         $request->validate([
@@ -66,5 +62,54 @@ class CampaignController extends Controller
 
         return redirect()->route('campaigns.index')
             ->with('success', 'Campagne publiée avec succès !');
+    }
+
+    // ✅ NOUVEAU — Edit
+    public function edit(Campaign $campaign)
+    {
+        if ($campaign->association->user_id !== Auth::id()) {
+            abort(403);
+        }
+        return view('campaigns.edit', compact('campaign'));
+    }
+
+    // ✅ NOUVEAU — Update
+    public function update(Request $request, Campaign $campaign)
+    {
+        if ($campaign->association->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'title'       => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string'],
+            'goal_amount' => ['required', 'numeric', 'min:1'],
+            'deadline'    => ['nullable', 'date'],
+            'status'      => ['required', 'in:active,terminee,suspendue'],
+        ]);
+
+        $campaign->update([
+            'title'       => $request->title,
+            'description' => $request->description,
+            'goal_amount' => $request->goal_amount,
+            'deadline'    => $request->deadline,
+            'status'      => $request->status,
+        ]);
+
+        return redirect()->route('campaigns.show', $campaign)
+            ->with('success', 'Campagne mise à jour !');
+    }
+
+    // ✅ NOUVEAU — Destroy
+    public function destroy(Campaign $campaign)
+    {
+        if ($campaign->association->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $campaign->delete();
+
+        return redirect()->route('campaigns.index')
+            ->with('success', 'Campagne supprimée.');
     }
 }

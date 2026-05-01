@@ -56,4 +56,55 @@ class AssociationController extends Controller
         return redirect()->route('associations.index')
             ->with('success', 'Votre profil association a été soumis pour validation !');
     }
+
+    // Formulaire modification
+    public function edit(Association $association)
+    {
+        if ($association->user_id !== Auth::id()) {
+            abort(403);
+        }
+        return view('associations.edit', compact('association'));
+    }
+
+    // Sauvegarder modification
+    public function update(Request $request, Association $association)
+    {
+        if ($association->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'name'        => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string'],
+            'category'    => ['required', 'in:enfants,education,sante,alimentation,environnement,autre'],
+            'region'      => ['required', 'string'],
+            'website'     => ['nullable', 'url'],
+            'facebook'    => ['nullable', 'url'],
+        ]);
+
+        $association->update([
+            'name'        => $request->name,
+            'description' => $request->description,
+            'category'    => $request->category,
+            'region'      => $request->region,
+            'website'     => $request->website,
+            'facebook'    => $request->facebook,
+        ]);
+
+        return redirect()->route('associations.show', $association)
+            ->with('success', 'Association mise à jour avec succès !');
+    }
+
+    // Supprimer association
+    public function destroy(Association $association)
+    {
+        if ($association->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $association->delete();
+
+        return redirect()->route('associations.index')
+            ->with('success', 'Association supprimée.');
+    }
 }

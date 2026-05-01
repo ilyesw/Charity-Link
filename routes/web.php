@@ -8,8 +8,8 @@ use App\Http\Controllers\BesoinController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\TacheController;
 use App\Http\Controllers\ChatbotController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NotificationController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
@@ -32,6 +32,12 @@ Route::get('/associations/create', [AssociationController::class, 'create'])
     ->name('associations.create')->middleware('auth');
 Route::post('/associations', [AssociationController::class, 'store'])
     ->name('associations.store')->middleware('auth');
+Route::get('/associations/{association}/edit', [AssociationController::class, 'edit'])
+    ->name('associations.edit')->middleware('auth');
+Route::put('/associations/{association}', [AssociationController::class, 'update'])
+    ->name('associations.update')->middleware('auth');
+Route::delete('/associations/{association}', [AssociationController::class, 'destroy'])
+    ->name('associations.destroy')->middleware('auth');
 Route::get('/associations/{association}', [AssociationController::class, 'show'])
     ->name('associations.show');
 
@@ -42,16 +48,30 @@ Route::get('/campaigns/create', [CampaignController::class, 'create'])
     ->name('campaigns.create')->middleware('auth');
 Route::post('/campaigns', [CampaignController::class, 'store'])
     ->name('campaigns.store')->middleware('auth');
+Route::get('/campaigns/{campaign}/edit', [CampaignController::class, 'edit'])
+    ->name('campaigns.edit')->middleware('auth');
+Route::put('/campaigns/{campaign}', [CampaignController::class, 'update'])
+    ->name('campaigns.update')->middleware('auth');
+Route::delete('/campaigns/{campaign}', [CampaignController::class, 'destroy'])
+    ->name('campaigns.destroy')->middleware('auth');
 Route::get('/campaigns/{campaign}', [CampaignController::class, 'show'])
     ->name('campaigns.show');
 
-// Routes Besoins (accessible sans connexion)
+// Routes Besoins
+Route::get('/besoins', [BesoinController::class, 'index'])
+    ->name('besoins.index');
 Route::get('/besoins/create', [BesoinController::class, 'create'])
     ->name('besoins.create');
 Route::post('/besoins', [BesoinController::class, 'store'])
     ->name('besoins.store');
 Route::get('/besoins/confirmation', [BesoinController::class, 'confirmation'])
     ->name('besoins.confirmation');
+Route::post('/besoins/{besoin}/prendre-en-charge', [BesoinController::class, 'prendreEnCharge'])
+    ->name('besoins.prendre_en_charge')
+    ->middleware('auth');
+Route::post('/besoins/{besoin}/assigner', [BesoinController::class, 'assigner'])
+    ->name('besoins.assigner')
+    ->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class]);
 
 // Routes Donations
 Route::middleware(['auth'])->group(function () {
@@ -73,6 +93,12 @@ Route::middleware(['auth'])->group(function () {
         ->name('taches.create');
     Route::post('/taches', [TacheController::class, 'store'])
         ->name('taches.store');
+    Route::get('/taches/{tache}/edit', [TacheController::class, 'edit'])
+        ->name('taches.edit');
+    Route::put('/taches/{tache}', [TacheController::class, 'update'])
+        ->name('taches.update');
+    Route::delete('/taches/{tache}', [TacheController::class, 'destroy'])
+        ->name('taches.destroy');
     Route::post('/taches/{tache}/postuler', [TacheController::class, 'postuler'])
         ->name('taches.postuler');
     Route::post('/taches/{tache}/compte-rendu', [TacheController::class, 'compte_rendu'])
@@ -97,7 +123,6 @@ Route::get('/chatbot', [ChatbotController::class, 'index'])
     ->name('chatbot.index');
 Route::post('/chatbot/chat', [ChatbotController::class, 'chat'])
     ->name('chatbot.chat');
-
 
 // Routes Notifications
 Route::middleware(['auth'])->group(function () {

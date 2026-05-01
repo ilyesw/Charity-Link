@@ -1,26 +1,15 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <div class="section-label"><i class="bi bi-megaphone"></i> Nouvelle campagne</div>
-            <h2 class="mb-0" style="font-size:1.5rem;">Publier une campagne</h2>
-            <p class="header-sub mb-0">Créez une collecte pour votre association.</p>
+            <div class="section-label"><i class="bi bi-building-gear"></i> Modifier</div>
+            <h2 class="mb-0" style="font-size:1.5rem;">Modifier mon association</h2>
+            <p class="header-sub mb-0">Mettez à jour les informations de votre profil.</p>
         </div>
     </x-slot>
 
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="fm-card">
-
-                {{-- Contexte association --}}
-                <div class="fm-context">
-                    <div class="fm-context-icon">
-                        <i class="bi bi-building"></i>
-                    </div>
-                    <div>
-                        <div class="fm-context-label">Campagne pour</div>
-                        <div class="fm-context-name">{{ $association->name }}</div>
-                    </div>
-                </div>
 
                 @if($errors->any())
                     <div class="fm-alert">
@@ -33,58 +22,100 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('campaigns.store') }}">
+                {{-- Formulaire DELETE caché --}}
+                <form id="deleteForm" method="POST"
+                    action="{{ route('associations.destroy', $association) }}"
+                    onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette association ? Cette action est irréversible.')">
                     @csrf
+                    @method('DELETE')
+                </form>
 
-                    {{-- Section 1 : Détails --}}
+                {{-- Formulaire UPDATE --}}
+                <form method="POST" action="{{ route('associations.update', $association) }}">
+                    @csrf
+                    @method('PUT')
+
+                    {{-- Section 1 : Infos générales --}}
                     <div class="fm-section">
                         <div class="fm-section-head">
                             <div class="fm-section-icon">
-                                <i class="bi bi-megaphone"></i>
+                                <i class="bi bi-building-gear"></i>
                             </div>
-                            <span class="fm-section-title">Détails de la campagne</span>
+                            <span class="fm-section-title">Informations générales</span>
                         </div>
                         <div class="fm-section-body">
                             <div class="fm-group">
-                                <label class="fm-label">Titre de la campagne</label>
-                                <input type="text" name="title" class="fm-input"
-                                    value="{{ old('title') }}"
-                                    placeholder="Ex: Collecte pour les enfants de Sousse" required>
+                                <label class="fm-label">Nom de l'association</label>
+                                <input type="text" name="name" class="fm-input"
+                                    value="{{ old('name', $association->name) }}" required>
                             </div>
                             <div class="fm-group">
                                 <label class="fm-label">Description</label>
-                                <textarea name="description" class="fm-input fm-textarea" rows="5"
-                                    placeholder="Décrivez l'objectif de votre campagne et comment les fonds seront utilisés..." required>{{ old('description') }}</textarea>
+                                <textarea name="description" class="fm-input fm-textarea" rows="4" required>{{ old('description', $association->description) }}</textarea>
                             </div>
                         </div>
                     </div>
 
-                    {{-- Section 2 : Objectif --}}
+                    {{-- Section 2 : Localisation --}}
                     <div class="fm-section">
                         <div class="fm-section-head">
                             <div class="fm-section-icon">
-                                <i class="bi bi-cash-stack"></i>
+                                <i class="bi bi-geo-alt"></i>
                             </div>
-                            <span class="fm-section-title">Objectif et durée</span>
+                            <span class="fm-section-title">Localisation et catégorie</span>
                         </div>
                         <div class="fm-section-body">
                             <div class="fm-row">
                                 <div class="fm-group">
-                                    <label class="fm-label">Objectif financier</label>
-                                    <div class="fm-input-suffix-wrap">
-                                        <input type="number" name="goal_amount" class="fm-input fm-input--has-suffix"
-                                            value="{{ old('goal_amount') }}"
-                                            placeholder="Ex: 5000"
-                                            min="1" step="0.01" required>
-                                        <span class="fm-input-suffix">DT</span>
+                                    <label class="fm-label">Catégorie</label>
+                                    <select name="category" class="fm-select">
+                                        @foreach(['enfants','education','sante','alimentation','environnement','autre'] as $cat)
+                                            <option value="{{ $cat }}"
+                                                {{ old('category', $association->category) == $cat ? 'selected' : '' }}>
+                                                {{ ucfirst($cat) }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="fm-group">
+                                    <label class="fm-label">Région</label>
+                                    <select name="region" class="fm-select">
+                                        @foreach(['Tunis','Sfax','Sousse','Kairouan','Bizerte','Gabès','Ariana','Monastir','Nabeul','Autre'] as $reg)
+                                            <option value="{{ $reg }}"
+                                                {{ old('region', $association->region) == $reg ? 'selected' : '' }}>
+                                                {{ $reg }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Section 3 : Réseaux --}}
+                    <div class="fm-section">
+                        <div class="fm-section-head">
+                            <div class="fm-section-icon fm-section-icon--muted">
+                                <i class="bi bi-link-45deg"></i>
+                            </div>
+                            <span class="fm-section-title">Réseaux et contact <span class="fm-section-optional">optionnel</span></span>
+                        </div>
+                        <div class="fm-section-body">
+                            <div class="fm-row">
+                                <div class="fm-group">
+                                    <label class="fm-label">Site web</label>
+                                    <div class="fm-input-icon-wrap">
+                                        <i class="bi bi-globe"></i>
+                                        <input type="url" name="website" class="fm-input fm-input--has-icon"
+                                            value="{{ old('website', $association->website) }}" placeholder="<https://monsite.tn>">
                                     </div>
                                 </div>
                                 <div class="fm-group">
-                                    <label class="fm-label">Date limite <span class="fm-section-optional">optionnel</span></label>
+                                    <label class="fm-label">Facebook</label>
                                     <div class="fm-input-icon-wrap">
-                                        <i class="bi bi-calendar-event"></i>
-                                        <input type="date" name="deadline" class="fm-input fm-input--has-icon"
-                                            value="{{ old('deadline') }}">
+                                        <i class="bi bi-facebook"></i>
+                                        <input type="url" name="facebook" class="fm-input fm-input--has-icon"
+                                            value="{{ old('facebook', $association->facebook) }}" placeholder="<https://facebook.com/>...">
                                     </div>
                                 </div>
                             </div>
@@ -92,14 +123,20 @@
                     </div>
 
                     {{-- Actions --}}
-                    <div class="fm-actions">
-                        <a href="{{ route('campaigns.index') }}" class="fm-btn fm-btn--ghost">
-                            Annuler
-                        </a>
-                        <button type="submit" class="fm-btn fm-btn--red">
-                            <i class="bi bi-rocket-takeoff"></i>
-                            Publier la campagne
+                    <div class="fm-actions fm-actions--split">
+                        <button type="submit" form="deleteForm" class="fm-btn fm-btn--danger-outline">
+                            <i class="bi bi-trash3"></i>
+                            Supprimer
                         </button>
+                        <div class="d-flex gap-2">
+                            <a href="{{ route('associations.show', $association) }}" class="fm-btn fm-btn--ghost">
+                                Annuler
+                            </a>
+                            <button type="submit" class="fm-btn fm-btn--red">
+                                <i class="bi bi-check-lg"></i>
+                                Sauvegarder
+                            </button>
+                        </div>
                     </div>
 
                 </form>
@@ -109,43 +146,6 @@
 </x-app-layout>
 
 <style>
-    /* ════════════════ CONTEXT CARD ════════════════ */
-    .fm-context {
-        display: flex;
-        align-items: center;
-        gap: 0.85rem;
-        padding: 0.85rem 1rem;
-        background: var(--cl-light);
-        border: 1px solid var(--cl-border);
-        border-radius: var(--radius-md);
-        margin-bottom: 1.5rem;
-        transition: all 0.35s ease;
-    }
-    .fm-context-icon {
-        width: 44px; height: 44px;
-        background: var(--cl-card-bg);
-        border-radius: var(--radius-sm);
-        display: flex; align-items: center; justify-content: center;
-        flex-shrink: 0;
-        box-shadow: var(--shadow-xs);
-        transition: all 0.35s ease;
-    }
-    .fm-context-icon i { font-size: 1.1rem; color: var(--cl-red); }
-    .fm-context-label {
-        font-size: 0.75rem;
-        color: var(--cl-muted);
-        font-weight: 500;
-        transition: color 0.35s ease;
-    }
-    .fm-context-name {
-        font-family: 'Inter', sans-serif;
-        font-weight: 700;
-        font-size: 0.95rem;
-        color: var(--cl-dark);
-        transition: color 0.35s ease;
-    }
-
-    /* ════════════════ FORM CARD ════════════════ */
     .fm-card {
         background: var(--cl-card-bg);
         border: 1px solid var(--cl-card-border);
@@ -155,7 +155,6 @@
         transition: all 0.35s ease;
     }
 
-    /* ════════════════ ALERT ════════════════ */
     .fm-alert {
         display: flex;
         align-items: flex-start;
@@ -181,7 +180,6 @@
         80% { transform: translateX(3px); }
     }
 
-    /* ════════════════ SECTION ════════════════ */
     .fm-section { margin-bottom: 1.75rem; }
     .fm-section:last-of-type { margin-bottom: 1.5rem; }
     .fm-section-head {
@@ -212,18 +210,15 @@
     }
     .fm-section-body { padding-left: 0.25rem; }
 
-    /* ════════════════ GROUP ════════════════ */
     .fm-group { margin-bottom: 1.1rem; }
     .fm-group:last-child { margin-bottom: 0; }
 
-    /* ════════════════ LABEL ════════════════ */
     .fm-label {
         display: block; font-family: 'Inter', sans-serif; font-weight: 600;
         font-size: 0.8rem; color: var(--cl-body);
         margin-bottom: 0.4rem; transition: color 0.35s ease;
     }
 
-    /* ════════════════ INPUT ════════════════ */
     .fm-input {
         width: 100%; padding: 0.6rem 0.85rem;
         font-family: 'Inter', sans-serif; font-size: 0.85rem;
@@ -241,9 +236,7 @@
     .fm-input::placeholder { color: var(--cl-muted-light); }
     .fm-textarea { resize: vertical; min-height: 100px; }
     .fm-input--has-icon { padding-left: 2.5rem; }
-    .fm-input--has-suffix { padding-right: 2.5rem; }
 
-    /* ════════════════ INPUT WITH ICON ════════════════ */
     .fm-input-icon-wrap { position: relative; }
     .fm-input-icon-wrap i {
         position: absolute; left: 0.85rem; top: 50%;
@@ -254,31 +247,40 @@
     .fm-input-icon-wrap .fm-input:focus ~ i,
     .fm-input-icon-wrap:focus-within i { color: var(--cl-red); }
 
-    /* ════════════════ INPUT WITH SUFFIX ════════════════ */
-    .fm-input-suffix-wrap { position: relative; }
-    .fm-input-suffix {
-        position: absolute; right: 0.85rem; top: 50%;
-        transform: translateY(-50%);
-        font-family: 'Inter', sans-serif; font-weight: 700;
-        font-size: 0.82rem; color: var(--cl-dark);
-        pointer-events: none;
-        transition: color 0.35s ease;
+    .fm-select {
+        width: 100%; padding: 0.6rem 2.2rem 0.6rem 0.85rem;
+        font-family: 'Inter', sans-serif; font-size: 0.85rem;
+        color: var(--cl-dark);
+        background: var(--cl-light) url("data:image/svg+xml,%3Csvg xmlns='<http://www.w3.org/2000/svg>' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 0.85rem center;
+        border: 1.5px solid var(--cl-border);
+        border-radius: var(--radius-md);
+        outline: none !important; box-shadow: none !important;
+        appearance: none; -webkit-appearance: none;
+        cursor: pointer; transition: all 0.25s ease;
+    }
+    .fm-select:focus {
+        border-color: var(--cl-red) !important;
+        box-shadow: 0 0 0 3px rgba(230,57,70,0.08) !important;
+        background-color: var(--cl-card-bg);
+    }
+    html.dark .fm-select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='<http://www.w3.org/2000/svg>' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     }
 
-    /* ════════════════ ROW ════════════════ */
     .fm-row {
         display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
     }
 
-    /* ════════════════ ACTIONS ════════════════ */
     .fm-actions {
         display: flex; justify-content: flex-end; gap: 0.75rem;
         padding-top: 1.25rem;
         border-top: 1px solid var(--cl-border);
         transition: border-color 0.35s ease;
     }
+    .fm-actions--split {
+        justify-content: space-between;
+    }
 
-    /* ════════════════ BUTTONS ════════════════ */
     .fm-btn {
         display: inline-flex; align-items: center; gap: 0.45rem;
         padding: 0.6rem 1.4rem;
@@ -290,6 +292,7 @@
     }
     .fm-btn:focus { outline: none !important; box-shadow: none !important; }
     .fm-btn i { font-size: 0.88rem; }
+
     .fm-btn--red {
         background: var(--cl-red); color: #fff;
         box-shadow: 0 2px 8px rgba(230,57,70,0.2);
@@ -299,6 +302,7 @@
         transform: translateY(-1px);
         box-shadow: 0 4px 14px rgba(230,57,70,0.28) !important;
     }
+
     .fm-btn--ghost {
         background: transparent; color: var(--cl-muted);
         border: 1.5px solid var(--cl-border) !important;
@@ -308,7 +312,17 @@
         background: var(--cl-light);
     }
 
-    /* ════════════════ RESPONSIVE ════════════════ */
+    .fm-btn--danger-outline {
+        background: var(--cl-red-glow); color: var(--cl-red);
+        border: 1.5px solid rgba(230,57,70,0.2) !important;
+    }
+    .fm-btn--danger-outline:hover {
+        background: var(--cl-red); color: #fff;
+        border-color: var(--cl-red) !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(230,57,70,0.25) !important;
+    }
+
     @media (max-width: 767.98px) {
         .fm-card {
             padding: 1.25rem 1.1rem;
@@ -316,8 +330,11 @@
             box-shadow: none; border: none;
         }
         .fm-row { grid-template-columns: 1fr; gap: 0; }
-        .fm-actions {
+        .fm-actions--split {
             flex-direction: column-reverse; gap: 0.6rem;
+        }
+        .fm-actions--split > .d-flex {
+            flex-direction: column-reverse; gap: 0.6rem; width: 100%;
         }
         .fm-btn {
             justify-content: center; width: 100%; padding: 0.7rem;
