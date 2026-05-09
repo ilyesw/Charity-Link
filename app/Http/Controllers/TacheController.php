@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers;
+
 use App\Models\Tache;
 use App\Models\Association;
 use App\Helpers\NotificationHelper;
@@ -74,13 +75,22 @@ class TacheController extends Controller
             ->with('success', 'Vous avez accepté cette tâche !');
     }
 
+    // ✅ MIS À JOUR — sépare actives et archivées
     public function mes_taches()
     {
         $taches = Tache::where('benevole_id', Auth::id())
+            ->where('is_archived', false)
             ->with('association')
             ->latest()
             ->get();
-        return view('taches.mes_taches', compact('taches'));
+
+        $taches_archivees = Tache::where('benevole_id', Auth::id())
+            ->where('is_archived', true)
+            ->with('association')
+            ->latest()
+            ->get();
+
+        return view('taches.mes_taches', compact('taches', 'taches_archivees'));
     }
 
     public function compte_rendu(Request $request, Tache $tache)
@@ -98,7 +108,6 @@ class TacheController extends Controller
             ->with('success', 'Compte rendu soumis avec succès !');
     }
 
-    // ✅ NOUVEAU — Edit
     public function edit(Tache $tache)
     {
         if ($tache->association->user_id !== Auth::id()) {
@@ -107,7 +116,6 @@ class TacheController extends Controller
         return view('taches.edit', compact('tache'));
     }
 
-    // ✅ NOUVEAU — Update
     public function update(Request $request, Tache $tache)
     {
         if ($tache->association->user_id !== Auth::id()) {
@@ -131,7 +139,6 @@ class TacheController extends Controller
             ->with('success', 'Tâche mise à jour !');
     }
 
-    // ✅ NOUVEAU — Destroy
     public function destroy(Tache $tache)
     {
         if ($tache->association->user_id !== Auth::id()) {
@@ -140,5 +147,19 @@ class TacheController extends Controller
         $tache->delete();
         return redirect()->route('taches.index')
             ->with('success', 'Tâche supprimée.');
+    }
+
+    // ✅ NOUVEAU — Archiver une tâche
+    public function archiver(Tache $tache)
+    {
+        // Seul le bénévole assigné peut archiver
+        if ($tache->benevole_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $tache->update(['is_archived' => true]);
+
+        return redirect()->route('taches.mes_taches')
+            ->with('success', 'Tâche archivée avec succès !');
     }
 }

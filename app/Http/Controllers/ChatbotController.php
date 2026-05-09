@@ -41,7 +41,7 @@ la plus adaptée selon sa demande.";
         try {
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
-            ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . env('GEMINI_API_KEY'), [
+            ])->post("https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-lite:generateContent?key=" . env('GEMINI_API_KEY'), [
                 'contents' => [
                     [
                         'parts' => [

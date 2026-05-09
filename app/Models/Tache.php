@@ -20,10 +20,12 @@ class Tache extends Model
         'feedback',
         'compte_rendu',
         'note_association',
+        'is_archived',   // ✅ AJOUTÉ
     ];
 
     protected $casts = [
-        'deadline' => 'date',
+        'deadline'    => 'date',
+        'is_archived' => 'boolean',  // ✅ AJOUTÉ — 0/1 devient true/false
     ];
 
     // Relation avec Association

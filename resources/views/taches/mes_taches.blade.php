@@ -21,8 +21,9 @@
         </div>
     @endif
 
+    {{-- ======================== TÂCHES ACTIVES ======================== --}}
     <div class="ls-count">
-        <strong>{{ $taches->count() }}</strong> mission(s) assignée(s)
+        <strong>{{ $taches->count() }}</strong> mission(s) active(s)
     </div>
 
     @if($taches->isEmpty())
@@ -84,7 +85,7 @@
                             @endif
                         </div>
 
-                        {{-- Compte rendu déja soumis --}}
+                        {{-- Compte rendu déjà soumis --}}
                         @if($tache->compte_rendu)
                             <div class="ls-report-block">
                                 <div class="ls-report-head">
@@ -122,9 +123,65 @@
                             </div>
                         @endif
 
+                        {{-- ✅ BOUTON ARCHIVER — uniquement si tâche validée --}}
+                        @if($tache->status === 'validee')
+                            <div class="ls-archive-actions">
+                                <form method="POST" action="{{ route('taches.archiver', $tache) }}">
+                                    @csrf
+                                    <button type="submit" class="fm-btn fm-btn--ghost fm-btn--sm"
+                                        onclick="return confirm('Archiver cette tâche ?')">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                                        Archiver cette mission
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
+
                     </div>
                 </div>
             @endforeach
+        </div>
+    @endif
+
+    {{-- ======================== TÂCHES ARCHIVÉES ======================== --}}
+    @if($taches_archivees->isNotEmpty())
+        <div class="ls-archive-section">
+            <div class="ls-archive-header">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                Missions archivées ({{ $taches_archivees->count() }})
+            </div>
+
+            <div class="ls-list">
+                @foreach($taches_archivees as $tache)
+                    <div class="ls-card ls-card--archived">
+                        <div class="ls-card-body">
+                            <div class="ls-card-top">
+                                <div class="ls-card-avatar ls-card-avatar--muted">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--cl-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                                </div>
+                                <div class="ls-card-info">
+                                    <h6 class="ls-card-title" style="color:var(--cl-muted);">{{ $tache->title }}</h6>
+                                    <small class="ls-card-sub">{{ $tache->association->name }}</small>
+                                </div>
+                                <span class="ls-badge ls-badge--muted">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/></svg>
+                                    Archivée
+                                </span>
+                            </div>
+                            <p class="ls-card-desc">{{ $tache->description }}</p>
+                            @if($tache->compte_rendu)
+                                <div class="ls-report-block">
+                                    <div class="ls-report-head">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--cl-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                        Compte rendu
+                                    </div>
+                                    <p class="ls-report-text">{{ $tache->compte_rendu }}</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
         </div>
     @endif
 
@@ -156,8 +213,6 @@
         background: var(--cl-card-bg);
     }
     .ls-header-btn:hover { color: var(--cl-dark); border-color: var(--cl-muted); background: var(--cl-light); }
-    .ls-header-btn--red { background: var(--cl-red); color: #fff; border-color: var(--cl-red); }
-    .ls-header-btn--red:hover { background: var(--cl-red-hover); color: #fff; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(230,57,70,0.3); }
 
     .ls-count {
         font-size: 0.85rem; color: var(--cl-muted);
@@ -203,6 +258,8 @@
         transition: all 0.25s ease;
     }
     .ls-card:hover { box-shadow: var(--shadow-md); border-color: transparent; }
+    .ls-card--archived { opacity: 0.7; }
+    .ls-card--archived:hover { opacity: 1; }
     .ls-card-body { padding: 1.25rem 1.35rem; }
 
     .ls-card-top { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.85rem; }
@@ -213,6 +270,7 @@
         display: flex; align-items: center; justify-content: center;
         flex-shrink: 0;
     }
+    .ls-card-avatar--muted { background: var(--cl-light); }
     .ls-card-info { flex: 1; min-width: 0; }
     .ls-card-title { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 0.92rem; color: var(--cl-dark); margin-bottom: 0.1rem; }
     .ls-card-sub { font-size: 0.8rem; color: var(--cl-muted); }
@@ -226,6 +284,7 @@
     }
     .ls-badge--green { background: var(--cl-green-soft); color: #1A8C38; }
     .ls-badge--orange { background: rgba(245,166,35,0.1); color: #B8860B; }
+    .ls-badge--muted { background: var(--cl-light); color: var(--cl-muted); border: 1px solid var(--cl-border); }
 
     .ls-card-desc { font-size: 0.85rem; color: var(--cl-muted); line-height: 1.65; margin-bottom: 0.85rem; }
 
@@ -239,11 +298,9 @@
         font-size: 0.78rem; font-weight: 500;
         color: var(--cl-body);
     }
-    .ls-tag svg { flex-shrink: 0; }
 
     .ls-report-block {
-        margin-top: 1rem;
-        padding: 0.85rem 1rem;
+        margin-top: 1rem; padding: 0.85rem 1rem;
         background: var(--cl-green-soft);
         border: 1px solid rgba(45,198,83,0.15);
         border-radius: var(--radius-md);
@@ -256,19 +313,36 @@
     .ls-report-text { font-size: 0.82rem; color: var(--cl-body); line-height: 1.6; margin: 0; }
 
     .ls-report-form {
-        margin-top: 1rem;
-        padding-top: 1rem;
+        margin-top: 1rem; padding-top: 1rem;
         border-top: 1px solid var(--cl-border);
     }
     .ls-report-form-head {
         display: flex; align-items: center; gap: 0.5rem;
         font-family: 'Inter', sans-serif; font-weight: 700; font-size: 0.85rem;
-        color: var(--cl-dark);
-        margin-bottom: 0.85rem;
+        color: var(--cl-dark); margin-bottom: 0.85rem;
+    }
+
+    /* ✅ NOUVEAU — Bouton Archiver */
+    .ls-archive-actions {
+        margin-top: 1rem; padding-top: 0.85rem;
+        border-top: 1px solid var(--cl-border);
+        display: flex; justify-content: flex-end;
+    }
+
+    /* ✅ NOUVEAU — Section archivées */
+    .ls-archive-section {
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+        border-top: 2px dashed var(--cl-border);
+    }
+    .ls-archive-header {
+        display: flex; align-items: center; gap: 0.5rem;
+        font-family: 'Inter', sans-serif; font-weight: 700; font-size: 0.9rem;
+        color: var(--cl-muted);
+        margin-bottom: 1rem;
     }
 
     .fm-group { margin-bottom: 0.85rem; }
-    .fm-group:last-child { margin-bottom: 0; }
     .fm-label { display: block; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.8rem; color: var(--cl-body); margin-bottom: 0.35rem; }
     .fm-section-optional { font-weight: 400; font-size: 0.78rem; color: var(--cl-muted-light); margin-left: 0.3rem; }
 
@@ -290,12 +364,16 @@
         padding: 0.6rem 1.4rem;
         font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.84rem;
         border-radius: var(--radius-md);
-        text-decoration: none; cursor: pointer;
-        transition: all 0.25s ease;
-        border: none !important; outline: none !important; box-shadow: none !important;
+        cursor: pointer; transition: all 0.25s ease;
+        border: none !important; outline: none !important;
     }
     .fm-btn--red { background: var(--cl-red); color: #fff; box-shadow: 0 2px 8px rgba(230,57,70,0.2); }
-    .fm-btn--red:hover { background: var(--cl-red-hover); color: #fff; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(230,57,70,0.28) !important; }
+    .fm-btn--red:hover { background: var(--cl-red-hover); color: #fff; transform: translateY(-1px); }
+    .fm-btn--ghost {
+        background: transparent; color: var(--cl-muted);
+        border: 1.5px solid var(--cl-border) !important;
+    }
+    .fm-btn--ghost:hover { color: var(--cl-dark); border-color: var(--cl-muted) !important; background: var(--cl-light); }
     .fm-btn--sm { padding: 0.45rem 1rem; font-size: 0.8rem; }
 
     @media (max-width: 767.98px) {

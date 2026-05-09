@@ -14,23 +14,58 @@
         <div class="row justify-content-center">
             <div class="col-lg-8 col-xl-7">
 
-                {{-- Avatar Hero --}}
+                {{-- ✅ Avatar Hero avec upload --}}
                 <div class="pf-hero">
                     <div class="pf-hero-avatar">
-                        <div class="pf-avatar-circle">
-                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+
+                        {{-- Formulaire avatar caché --}}
+                        <form id="avatarForm" action="{{ route('profile.avatar') }}" method="POST"
+                              enctype="multipart/form-data">
+                            @csrf
+                            <input type="file" id="avatarInput" name="avatar"
+                                   accept=".jpg,.jpeg,.png,.webp"
+                                   style="display:none"
+                                   onchange="submitAvatarForm(this)">
+                        </form>
+
+                        {{-- Avatar cliquable --}}
+                        <div class="pf-avatar-circle" onclick="document.getElementById('avatarInput').click()"
+                             title="Cliquer pour changer la photo" style="cursor:pointer;">
+                            @if(Auth::user()->avatar)
+                                <img id="avatarPreview"
+                                     src="{{ Storage::url(Auth::user()->avatar) }}"
+                                     alt="Avatar"
+                                     style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-full);">
+                            @else
+                                <span id="avatarLetter">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
+                                <img id="avatarPreview" src="#" alt="Avatar"
+                                     style="display:none;width:100%;height:100%;object-fit:cover;border-radius:var(--radius-full);">
+                            @endif
                         </div>
-                        <div class="pf-avatar-badge">
+
+                        {{-- Badge caméra --}}
+                        <div class="pf-avatar-badge" onclick="document.getElementById('avatarInput').click()"
+                             style="cursor:pointer;" title="Changer la photo">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
                         </div>
                     </div>
+
                     <div class="pf-hero-info">
                         <h3 class="pf-hero-name">{{ Auth::user()->name }}</h3>
                         <p class="pf-hero-email">{{ Auth::user()->email }}</p>
                         <span class="pf-hero-role">
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                            {{ Auth::user()->role ?? 'Membre' }}
+                            {{ ucfirst(Auth::user()->role ?? 'Membre') }}
                         </span>
+                        <p class="pf-avatar-hint">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                            Cliquez sur la photo pour la modifier
+                        </p>
+
+                        {{-- Message succès avatar --}}
+                        @if(session('status') === 'avatar-updated')
+                            <span class="pf-avatar-success">✅ Photo mise à jour !</span>
+                        @endif
                     </div>
                 </div>
 
@@ -113,17 +148,22 @@
             font-weight: 700; font-size: 1.8rem;
             display: flex; align-items: center; justify-content: center;
             box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: opacity 0.2s ease;
         }
+        .pf-avatar-circle:hover { opacity: 0.85; }
         .pf-avatar-badge {
             position: absolute; bottom: 0; right: 0;
             width: 28px; height: 28px;
-            background: var(--cl-card-bg);
-            border: 2px solid var(--cl-card-border);
+            background: var(--cl-red);
+            border: 2px solid var(--cl-card-bg);
             border-radius: var(--radius-full);
             display: flex; align-items: center; justify-content: center;
-            color: var(--cl-muted);
+            color: #fff;
             box-shadow: var(--shadow-xs);
+            transition: transform 0.2s ease;
         }
+        .pf-avatar-badge:hover { transform: scale(1.1); }
         .pf-hero-info { min-width: 0; }
         .pf-hero-name {
             font-family: 'Inter', sans-serif;
@@ -142,6 +182,18 @@
             letter-spacing: 0.05em; text-transform: uppercase;
         }
         html.dark .pf-hero-role { background: rgba(29,53,87,0.2); color: #93bbfd; }
+        .pf-avatar-hint {
+            font-size: 0.72rem; color: var(--cl-muted);
+            display: flex; align-items: center; gap: 0.3rem;
+            margin-top: 0.5rem; margin-bottom: 0;
+        }
+        .pf-avatar-success {
+            display: inline-block;
+            margin-top: 0.4rem;
+            font-size: 0.78rem;
+            color: #1A8C38;
+            font-weight: 600;
+        }
 
         /* ─── Sections ─── */
         .pf-section {
@@ -161,7 +213,6 @@
             background: rgba(230,57,70,0.06);
             border-color: rgba(230,57,70,0.15);
         }
-
         .pf-section-head {
             display: flex; align-items: center; gap: 0.85rem;
             padding: 1.35rem 1.5rem 0;
@@ -176,7 +227,6 @@
         html.dark .pf-section-icon--blue { background: rgba(29,53,87,0.2); color: #93bbfd; }
         .pf-section-icon--orange { background: rgba(245,166,35,0.08); color: #B8860B; }
         .pf-section-icon--red { background: var(--cl-red-glow); color: var(--cl-red); }
-
         .pf-section-title {
             font-family: 'Inter', sans-serif;
             font-weight: 700; font-size: 0.95rem;
@@ -185,12 +235,10 @@
         }
         .pf-section-title--red { color: var(--cl-red); }
         .pf-section-desc { font-size: 0.82rem; color: var(--cl-muted); margin: 0; }
-
         .pf-section-body { padding: 1.15rem 1.5rem 1.5rem; }
 
-        /* ─── Form wrapper (styles les partials) ─── */
+        /* ─── Form wrapper ─── */
         .pf-form-wrap form { max-width: 100%; }
-
         .pf-form-wrap input,
         .pf-form-wrap select,
         .pf-form-wrap textarea {
@@ -214,10 +262,7 @@
             background: var(--cl-card-bg) !important;
         }
         .pf-form-wrap input::placeholder,
-        .pf-form-wrap textarea::placeholder {
-            color: var(--cl-muted-light) !important;
-        }
-
+        .pf-form-wrap textarea::placeholder { color: var(--cl-muted-light) !important; }
         .pf-form-wrap label {
             display: block;
             font-family: 'Inter', sans-serif !important;
@@ -226,13 +271,8 @@
             color: var(--cl-body) !important;
             margin-bottom: 0.35rem !important;
         }
-
         .pf-form-wrap .form-text,
-        .pf-form-wrap small {
-            font-size: 0.78rem !important;
-            color: var(--cl-muted) !important;
-        }
-
+        .pf-form-wrap small { font-size: 0.78rem !important; color: var(--cl-muted) !important; }
         .pf-form-wrap button[type="submit"] {
             display: inline-flex; align-items: center; gap: 0.4rem;
             padding: 0.6rem 1.4rem !important;
@@ -255,8 +295,6 @@
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(29,53,87,0.2) !important;
         }
-
-        /* Bouton danger */
         .pf-form-wrap .btn-danger,
         .pf-form-wrap button[class*="danger"],
         .pf-form-wrap button[class*="red"],
@@ -266,7 +304,6 @@
         }
         .pf-form-wrap .btn-danger:hover,
         .pf-form-wrap button[class*="danger"]:hover,
-        .pf-form-wrap button[class*="red"]:hover,
         .pf-section--danger .pf-form-wrap button[type="submit"]:hover {
             background: var(--cl-red-hover) !important;
             color: #fff !important;
@@ -283,6 +320,7 @@
                 box-shadow: none; border: none;
             }
             .pf-avatar-circle { width: 68px; height: 68px; font-size: 1.5rem; }
+            .pf-avatar-hint { justify-content: center; }
             .pf-section {
                 border-radius: var(--radius-lg);
                 box-shadow: none; border: none;
@@ -294,4 +332,27 @@
             .pf-form-wrap button[type="submit"] { width: 100%; justify-content: center; }
         }
     </style>
+
+    <script>
+        function submitAvatarForm(input) {
+            if (!input.files || !input.files[0]) return;
+
+            const file = input.files[0];
+
+            // Aperçu immédiat
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('avatarPreview');
+                const letter = document.getElementById('avatarLetter');
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                if (letter) letter.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+
+            // Soumettre le formulaire
+            document.getElementById('avatarForm').submit();
+        }
+    </script>
+
 </x-app-layout>

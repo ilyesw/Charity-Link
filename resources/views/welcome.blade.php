@@ -5,16 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CharityLink — Solidarité Numérique Tunisienne</title>
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        /* ══════════════ LIGHT MODE (default) ══════════════ */
         :root {
             --cl-red: #E63946;
             --cl-red-hover: #d32f3d;
@@ -55,7 +51,6 @@
             --radius-full: 9999px;
         }
 
-        /* ══════════════ DARK MODE ══════════════ */
         html.dark {
             --cl-red-soft: rgba(230, 57, 70, 0.12);
             --cl-red-glow: rgba(230, 57, 70, 0.14);
@@ -114,7 +109,6 @@
         html.dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }
         img { max-width: 100%; }
 
-        /* ══════════════ ANIMATIONS ══════════════ */
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(24px); }
             to { opacity: 1; transform: translateY(0); }
@@ -141,7 +135,6 @@
         .anim-fade-up-d3 { animation: fadeUp 0.7s 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
         .anim-fade-up-d4 { animation: fadeUp 0.7s 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
-        /* ══════════════ DARK MODE TOGGLE ══════════════ */
         .dark-toggle {
             width: 40px; height: 40px;
             border-radius: var(--radius-sm);
@@ -167,7 +160,34 @@
         html.dark .dark-toggle .icon-sun { display: block; }
         html.dark .dark-toggle .icon-moon { display: none; }
 
-        /* ══════════════ NAVBAR ══════════════ */
+        /* ══════════════ LANGUAGE SWITCHER ══════════════ */
+        .lang-switcher {
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+            background: var(--cl-light);
+            border: 1px solid var(--cl-border);
+            border-radius: var(--radius-sm);
+            padding: 0.2rem;
+            transition: all 0.35s ease;
+        }
+        .lang-btn {
+            padding: 0.25rem 0.45rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            text-decoration: none;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease;
+        }
+        .lang-btn:hover { background: var(--cl-card-bg); }
+        .lang-btn--active {
+            background: var(--cl-card-bg);
+            box-shadow: var(--shadow-xs);
+        }
+
         .navbar-main {
             background: var(--cl-nav-bg);
             backdrop-filter: blur(20px) saturate(180%);
@@ -277,7 +297,6 @@
         .navbar-toggler:hover { border-color: var(--cl-red); }
         .navbar-toggler:focus { box-shadow: none; border-color: var(--cl-red); }
 
-        /* ══════════════ HERO ══════════════ */
         .hero {
             background: var(--cl-white);
             position: relative;
@@ -418,7 +437,6 @@
             box-shadow: var(--shadow-lg);
         }
 
-        /* Hero Stats */
         .hero-stats {
             display: flex;
             gap: 0;
@@ -459,7 +477,6 @@
             transition: color 0.35s ease;
         }
 
-        /* Hero Cards */
         .hero-cards-col { position: relative; z-index: 2; }
 
         .hero-card {
@@ -585,7 +602,6 @@
         .hero-empty-state .icon-wrap i { font-size: 1.5rem; color: var(--cl-red); }
         .hero-empty-state p { color: var(--cl-muted); font-size: 0.92rem; margin: 0; }
 
-        /* Floating badges */
         .hero-float-badge {
             position: absolute;
             background: var(--cl-card-bg);
@@ -625,7 +641,6 @@
             animation-delay: 1.2s;
         }
 
-        /* ══════════════ TRUST STRIP ══════════════ */
         .trust-strip {
             background: var(--cl-light);
             border-top: 1px solid var(--cl-border);
@@ -644,7 +659,6 @@
         }
         .trust-item i { font-size: 1rem; color: var(--cl-green); }
 
-        /* ══════════════ SECTION COMMONS ══════════════ */
         .section-eyebrow {
             display: inline-flex;
             align-items: center;
@@ -672,7 +686,6 @@
             transition: color 0.35s ease;
         }
 
-        /* ══════════════ HOW IT WORKS ══════════════ */
         .how-section {
             background: var(--cl-white);
             position: relative;
@@ -725,7 +738,6 @@
         .step-card h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem; }
         .step-card p { font-size: 0.9rem; color: var(--cl-muted); line-height: 1.7; margin: 0; transition: color 0.35s ease; }
 
-        /* ══════════════ CAMPAIGNS ══════════════ */
         .campaigns-section {
             background: var(--cl-light);
             transition: background-color 0.35s ease;
@@ -819,7 +831,6 @@
         }
         .btn-see-all:hover { border-color: var(--cl-red); color: var(--cl-red); transform: translateY(-1px); box-shadow: var(--shadow-md); }
 
-        /* ══════════════ CHATBOT CTA ══════════════ */
         .chatbot-section { background: var(--cl-white); transition: background-color 0.35s ease; }
         .chatbot-cta-card {
             background: var(--cl-blue);
@@ -842,7 +853,6 @@
         .btn-chatbot:hover { transform: translateY(-3px); box-shadow: 0 10px 35px rgba(0,0,0,0.25); color: var(--cl-blue); }
         .btn-chatbot .robot-icon { font-size: 1.2rem; animation: float 3s ease-in-out infinite; }
 
-        /* ══════════════ ACTORS ══════════════ */
         .actors-section { background: var(--cl-light); transition: background-color 0.35s ease; }
         .actor-card {
             background: var(--cl-card-bg);
@@ -871,7 +881,6 @@
         .actor-card .actor-name { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--cl-dark); margin-bottom: 0.35rem; transition: color 0.35s ease; }
         .actor-card .actor-desc { font-size: 0.8rem; color: var(--cl-muted); line-height: 1.6; margin: 0; transition: color 0.35s ease; }
 
-        /* ══════════════ FOOTER ══════════════ */
         .footer-main { background: #0c1222; position: relative; }
         html.dark .footer-main { background: #060a14; }
         .footer-main::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent); }
@@ -890,7 +899,6 @@
         .footer-bottom { color: rgba(255,255,255,0.25); font-size: 0.8rem; }
         .footer-bottom .hl { color: rgba(255,255,255,0.5); }
 
-        /* ══════════════ RESPONSIVE ══════════════ */
         @media (max-width: 1199.98px) {
             .hero-float-badge { display: none !important; }
         }
@@ -932,33 +940,55 @@
                 </div>
                 <span class="nav-brand-name">Charity<span>Link</span></span>
             </a>
+
+            {{-- Mobile : dark toggle + lang switcher + burger --}}
             <div class="d-flex align-items-center gap-2 d-lg-none">
                 <button class="dark-toggle" id="darkToggleMobile" aria-label="Mode sombre">
                     <i class="bi bi-moon-stars-fill icon-moon"></i>
                     <i class="bi bi-sun-fill icon-sun"></i>
                 </button>
+                {{-- ✅ Language Switcher Mobile --}}
+                <div class="lang-switcher">
+                    <a href="{{ route('lang.switch', 'fr') }}"
+                       class="lang-btn {{ app()->getLocale() === 'fr' ? 'lang-btn--active' : '' }}"
+                       title="Français">🇫🇷</a>
+                    <a href="{{ route('lang.switch', 'en') }}"
+                       class="lang-btn {{ app()->getLocale() === 'en' ? 'lang-btn--active' : '' }}"
+                       title="English">🇬🇧</a>
+                </div>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent" aria-controls="navContent" aria-expanded="false" aria-label="Menu">
                     <span class="navbar-toggler-icon"></span>
                 </button>
             </div>
+
             <div class="collapse navbar-collapse" id="navContent">
                 <ul class="navbar-nav mx-auto mb-3 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link" href="{{ route('associations.index') }}">Associations</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('campaigns.index') }}">Campagnes</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('taches.index') }}">Bénévolat</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('besoins.create') }}">Besoin d'aide</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('chatbot.index') }}"><i class="bi bi-robot nav-icon-ai"></i> Assistant IA</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('associations.index') }}">{{ __('Associations') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('campaigns.index') }}">{{ __('Campagnes') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('taches.index') }}">{{ __('Bénévolat') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('besoins.index') }}">{{ __("Besoin d'aide") }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('chatbot.index') }}"><i class="bi bi-robot nav-icon-ai"></i> {{ __('Assistant IA') }}</a></li>
                 </ul>
                 <div class="d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2">
+                    {{-- Desktop : dark toggle --}}
                     <button class="dark-toggle d-none d-lg-flex" id="darkToggleDesktop" aria-label="Mode sombre">
                         <i class="bi bi-moon-stars-fill icon-moon"></i>
                         <i class="bi bi-sun-fill icon-sun"></i>
                     </button>
+                    {{-- ✅ Language Switcher Desktop --}}
+                    <div class="lang-switcher d-none d-lg-flex">
+                        <a href="{{ route('lang.switch', 'fr') }}"
+                           class="lang-btn {{ app()->getLocale() === 'fr' ? 'lang-btn--active' : '' }}"
+                           title="Français">🇫🇷</a>
+                        <a href="{{ route('lang.switch', 'en') }}"
+                           class="lang-btn {{ app()->getLocale() === 'en' ? 'lang-btn--active' : '' }}"
+                           title="English">🇬🇧</a>
+                    </div>
                     @auth
-                        <a href="{{ route('dashboard') }}" class="nav-btn-donate">Mon espace <i class="bi bi-arrow-right"></i></a>
+                        <a href="{{ route('dashboard') }}" class="nav-btn-donate">{{ __('Dashboard') }} <i class="bi bi-arrow-right"></i></a>
                     @else
-                        <a href="{{ route('login') }}" class="nav-btn-ghost">Connexion</a>
-                        <a href="{{ route('register') }}" class="nav-btn-donate">S'inscrire <i class="bi bi-arrow-right"></i></a>
+                        <a href="{{ route('login') }}" class="nav-btn-ghost">{{ __('Connexion') }}</a>
+                        <a href="{{ route('register') }}" class="nav-btn-donate">{{ __("S'inscrire") }} <i class="bi bi-arrow-right"></i></a>
                     @endauth
                 </div>
             </div>
@@ -984,7 +1014,7 @@
                     </p>
                     <div class="hero-actions anim-fade-up-d3">
                         <a href="{{ route('campaigns.index') }}" class="btn-hero-primary">
-                            <i class="bi bi-heart-fill"></i> Faire un don
+                            <i class="bi bi-heart-fill"></i> {{ __('Faire un don') }}
                         </a>
                         <a href="{{ route('besoins.create') }}" class="btn-hero-secondary">
                             <i class="bi bi-megaphone-fill"></i> J'ai besoin d'aide
@@ -998,15 +1028,15 @@
                     <div class="hero-stats anim-fade-up-d4">
                         <div class="hero-stat">
                             <div class="hero-stat-value">{{ $totalAssociations }}</div>
-                            <div class="hero-stat-label">Associations</div>
+                            <div class="hero-stat-label">{{ __('Associations') }}</div>
                         </div>
                         <div class="hero-stat">
                             <div class="hero-stat-value">{{ $totalDons }}</div>
-                            <div class="hero-stat-label">Dons effectués</div>
+                            <div class="hero-stat-label">{{ __('Dons effectués') }}</div>
                         </div>
                         <div class="hero-stat">
                             <div class="hero-stat-value">{{ number_format($totalCollected, 0) }} DT</div>
-                            <div class="hero-stat-label">Collectés</div>
+                            <div class="hero-stat-label">{{ __('collectés') }}</div>
                         </div>
                     </div>
                 </div>
@@ -1108,10 +1138,10 @@
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-end mb-4 gap-3">
                 <div>
                     <div class="section-eyebrow"><i class="bi bi-fire"></i> Campagnes actives</div>
-                    <h2 class="section-heading mb-0">Soutenez ces causes urgentes</h2>
+                    <h2 class="section-heading mb-0">{{ __('Soutenez les causes urgentes') }}</h2>
                 </div>
                 <a href="{{ route('campaigns.index') }}" class="btn-see-all flex-shrink-0">
-                    Voir toutes <i class="bi bi-arrow-right"></i>
+                    {{ __('Voir tout') }} <i class="bi bi-arrow-right"></i>
                 </a>
             </div>
             @php $campaigns = \App\Models\Campaign::active()->with('association')->latest()->take(3)->get(); @endphp
@@ -1140,10 +1170,10 @@
                                 </div>
                                 <div class="cc-amounts">
                                     <span class="cc-raised">{{ number_format($campaign->current_amount, 0) }} DT</span>
-                                    <span class="cc-goal">Objectif : <strong>{{ number_format($campaign->goal_amount, 0) }} DT</strong> · {{ $campaign->progressPercentage() }}%</span>
+                                    <span class="cc-goal">{{ __('Objectif') }} : <strong>{{ number_format($campaign->goal_amount, 0) }} DT</strong> · {{ $campaign->progressPercentage() }}%</span>
                                 </div>
                                 <a href="{{ route('campaigns.show', $campaign) }}" class="btn-donate-card">
-                                    <i class="bi bi-heart-fill"></i> Contribuer
+                                    <i class="bi bi-heart-fill"></i> {{ __('Contribuer') }}
                                 </a>
                             </div>
                         </div>
@@ -1161,13 +1191,13 @@
             <div class="chatbot-cta-card p-4 p-md-5">
                 <div class="row align-items-center">
                     <div class="col-lg-8 mb-3 mb-lg-0">
-                        <h2>Vous ne savez pas quelle cause soutenir ?</h2>
+                        <h2>{{ __('Votre assistant solidaire') }}</h2>
                         <p>Notre assistant IA analyse votre intention et vous recommande l'association tunisienne la plus adaptée. Gratuit, instantané, intelligent.</p>
                     </div>
                     <div class="col-lg-4 text-lg-end">
                         <a href="{{ route('chatbot.index') }}" class="btn-chatbot">
                             <i class="bi bi-robot robot-icon"></i>
-                            Parler à l'assistant
+                            {{ __('Assistant IA') }}
                         </a>
                     </div>
                 </div>
@@ -1186,14 +1216,14 @@
                 <div class="col-6 col-lg">
                     <div class="actor-card">
                         <div class="actor-card-icon actor-icon-1">💰</div>
-                        <div class="actor-name">Donateur</div>
+                        <div class="actor-name">{{ __('Donateur') }}</div>
                         <p class="actor-desc">Fait des dons financiers, en nature ou en compétences.</p>
                     </div>
                 </div>
                 <div class="col-6 col-lg">
                     <div class="actor-card">
                         <div class="actor-card-icon actor-icon-2">🏢</div>
-                        <div class="actor-name">Association</div>
+                        <div class="actor-name">{{ __('Association') }}</div>
                         <p class="actor-desc">Publie des campagnes et gère les bénévoles.</p>
                     </div>
                 </div>
@@ -1207,7 +1237,7 @@
                 <div class="col-6 col-lg">
                     <div class="actor-card">
                         <div class="actor-card-icon actor-icon-4">🤝</div>
-                        <div class="actor-name">Bénévole</div>
+                        <div class="actor-name">{{ __('Bénévole') }}</div>
                         <p class="actor-desc">Prend des tâches et offre ses compétences.</p>
                     </div>
                 </div>
@@ -1247,18 +1277,18 @@
                 <div class="col-6 col-lg-3">
                     <div class="footer-heading">Plateforme</div>
                     <ul class="footer-links">
-                        <li><a href="{{ route('associations.index') }}"><i class="bi bi-chevron-right"></i> Associations</a></li>
-                        <li><a href="{{ route('campaigns.index') }}"><i class="bi bi-chevron-right"></i> Campagnes</a></li>
-                        <li><a href="{{ route('taches.index') }}"><i class="bi bi-chevron-right"></i> Bénévolat</a></li>
-                        <li><a href="{{ route('chatbot.index') }}"><i class="bi bi-chevron-right"></i> Assistant IA</a></li>
+                        <li><a href="{{ route('associations.index') }}"><i class="bi bi-chevron-right"></i> {{ __('Associations') }}</a></li>
+                        <li><a href="{{ route('campaigns.index') }}"><i class="bi bi-chevron-right"></i> {{ __('Campagnes') }}</a></li>
+                        <li><a href="{{ route('taches.index') }}"><i class="bi bi-chevron-right"></i> {{ __('Bénévolat') }}</a></li>
+                        <li><a href="{{ route('chatbot.index') }}"><i class="bi bi-chevron-right"></i> {{ __('Assistant IA') }}</a></li>
                     </ul>
                 </div>
                 <div class="col-6 col-lg-4">
                     <div class="footer-heading">Actions</div>
                     <ul class="footer-links">
-                        <li><a href="{{ route('register') }}"><i class="bi bi-chevron-right"></i> S'inscrire</a></li>
-                        <li><a href="{{ route('login') }}"><i class="bi bi-chevron-right"></i> Connexion</a></li>
-                        <li><a href="{{ route('besoins.create') }}"><i class="bi bi-chevron-right"></i> Déclarer un besoin</a></li>
+                        <li><a href="{{ route('register') }}"><i class="bi bi-chevron-right"></i> {{ __("S'inscrire") }}</a></li>
+                        <li><a href="{{ route('login') }}"><i class="bi bi-chevron-right"></i> {{ __('Connexion') }}</a></li>
+                        <li><a href="{{ route('besoins.create') }}"><i class="bi bi-chevron-right"></i> {{ __('Déclarer un besoin') }}</a></li>
                     </ul>
                 </div>
             </div>
@@ -1270,10 +1300,8 @@
         </div>
     </footer>
 
-    <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // ═══════════ DARK MODE ═══════════
         function getTheme() {
             return localStorage.getItem('cl-theme') ||
                 (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -1286,28 +1314,18 @@
             const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
             applyTheme(next);
         }
-
-        // Apply on load (before paint to avoid flash)
         applyTheme(getTheme());
-
-        // Toggle buttons
         document.getElementById('darkToggleDesktop').addEventListener('click', toggleTheme);
         document.getElementById('darkToggleMobile').addEventListener('click', toggleTheme);
-
-        // Listen for system preference changes
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-            if (!localStorage.getItem('cl-theme')) {
-                applyTheme(e.matches ? 'dark' : 'light');
-            }
+            if (!localStorage.getItem('cl-theme')) applyTheme(e.matches ? 'dark' : 'light');
         });
 
-        // ═══════════ NAVBAR SCROLL ═══════════
         const nav = document.getElementById('mainNav');
         window.addEventListener('scroll', () => {
             nav.classList.toggle('scrolled', window.scrollY > 20);
         }, { passive: true });
 
-        // ═══════════ PROGRESS BARS ANIMATE ═══════════
         const observerBars = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -1324,7 +1342,6 @@
         }, { threshold: 0.2 });
         document.querySelectorAll('.hero-card, .campaign-card').forEach(c => observerBars.observe(c));
 
-        // ═══════════ SCROLL REVEAL ═══════════
         const observerFade = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {

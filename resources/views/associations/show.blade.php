@@ -48,8 +48,14 @@
 
                 <!-- Avatar + Name -->
                 <div class="as-avatar-section">
-                    <div class="as-avatar">
-                        <i class="bi bi-building"></i>
+                    <div class="as-avatar" style="overflow:hidden; padding:0;">
+                        @if($association->logo)
+                            <img src="{{ asset('storage/' . $association->logo) }}"
+                                alt="{{ $association->name }}"
+                                style="width:100%; height:100%; object-fit:cover; border-radius:var(--radius-lg);">
+                        @else
+                            <i class="bi bi-building"></i>
+                        @endif
                     </div>
                     <div>
                         <h1 class="as-name">{{ $association->name }}</h1>
@@ -70,7 +76,7 @@
                 </div>
 
                 <!-- Contact Links -->
-                @if($association->website || $association->facebook)
+                @if($association->website || $association->facebook || $association->phone_mobile || $association->phone_fix || $association->email)
                     <div class="as-section">
                         <h6 class="as-section-title">
                             <i class="bi bi-link-45deg"></i>
@@ -94,6 +100,30 @@
                                     <span class="as-link-label">Facebook</span>
                                     <i class="bi bi-box-arrow-up-right as-link-arrow"></i>
                                 </a>
+                            @endif
+                            @if($association->phone_mobile)
+                                <div class="as-link">
+                                    <div class="as-link-icon" style="background:var(--cl-green-soft);">
+                                        <i class="bi bi-phone-fill" style="color:var(--cl-green);"></i>
+                                    </div>
+                                    <span class="as-link-label">{{ $association->phone_mobile }}</span>
+                                </div>
+                            @endif
+                            @if($association->phone_fix)
+                                <div class="as-link">
+                                    <div class="as-link-icon" style="background:var(--cl-blue-soft);">
+                                        <i class="bi bi-telephone-fill" style="color:var(--cl-blue);"></i>
+                                    </div>
+                                    <span class="as-link-label">{{ $association->phone_fix }}</span>
+                                </div>
+                            @endif
+                            @if($association->email)
+                                <div class="as-link">
+                                    <div class="as-link-icon" style="background:var(--cl-red-glow);">
+                                        <i class="bi bi-envelope-fill" style="color:var(--cl-red);"></i>
+                                    </div>
+                                    <span class="as-link-label">{{ $association->email }}</span>
+                                </div>
                             @endif
                         </div>
                     </div>

@@ -394,6 +394,34 @@
     html.dark .cl-user__btn:hover { background: var(--cl-border); }
     html.dark .cl-burger span { background: var(--cl-dark); }
 
+    /* ══════════════ LANGUAGE SWITCHER ══════════════ */
+    .lang-switcher {
+        display: flex;
+        align-items: center;
+        gap: 0.2rem;
+        background: var(--cl-light);
+        border: 1px solid var(--cl-border);
+        border-radius: var(--radius-sm);
+        padding: 0.2rem;
+        transition: all 0.35s ease;
+    }
+    .lang-btn {
+        padding: 0.25rem 0.45rem;
+        border-radius: 5px;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: background 0.2s ease;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .lang-btn:hover { background: var(--cl-card-bg); }
+    .lang-btn--active {
+        background: var(--cl-card-bg);
+        box-shadow: var(--shadow-xs);
+    }
+
     @media (max-width: 991.98px) {
         .cl-links { display: none; }
         .cl-burger { display: flex; }
@@ -427,27 +455,27 @@
         <ul class="cl-links">
             <li>
                 <a href="{{ route('associations.index') }}" class="cl-link {{ request()->routeIs('associations.*') ? 'active' : '' }}">
-                    Associations
+                    {{ __('Associations') }}
                 </a>
             </li>
             <li>
                 <a href="{{ route('campaigns.index') }}" class="cl-link {{ request()->routeIs('campaigns.*') ? 'active' : '' }}">
-                    Campagnes
+                    {{ __('Campagnes') }}
                 </a>
             </li>
             <li>
                 <a href="{{ route('taches.index') }}" class="cl-link {{ request()->routeIs('taches.*') ? 'active' : '' }}">
-                    Bénévolat
+                    {{ __('Bénévolat') }}
                 </a>
             </li>
             <li>
                 <a href="{{ route('besoins.index') }}" class="cl-link {{ request()->routeIs('besoins.*') ? 'active' : '' }}">
-                    Besoin d'aide
+                    {{ __("Besoin d'aide") }}
                 </a>
             </li>
             <li>
                 <a href="{{ route('chatbot.index') }}" class="cl-link {{ request()->routeIs('chatbot.*') ? 'active' : '' }}">
-                    <i class="bi bi-robot nav-icon-ai"></i> Assistant IA
+                    <i class="bi bi-robot nav-icon-ai"></i> {{ __('Assistant IA') }}
                 </a>
             </li>
         </ul>
@@ -465,6 +493,16 @@
                     <i class="bi bi-sun-fill icon-sun"></i>
                 </button>
 
+                {{-- Language Switcher Desktop --}}
+                <div class="lang-switcher d-none d-lg-flex">
+                    <a href="{{ route('lang.switch', 'fr') }}"
+                       class="lang-btn {{ app()->getLocale() === 'fr' ? 'lang-btn--active' : '' }}"
+                       title="Français">🇫🇷</a>
+                    <a href="{{ route('lang.switch', 'en') }}"
+                       class="lang-btn {{ app()->getLocale() === 'en' ? 'lang-btn--active' : '' }}"
+                       title="English">🇬🇧</a>
+                </div>
+
                 <a href="{{ route('notifications.index') }}" class="cl-notif" aria-label="Notifications">
                     <i class="bi bi-bell-fill"></i>
                     @if($notifCount > 0)
@@ -474,8 +512,14 @@
 
                 <div class="cl-user">
                     <button class="cl-user__btn" id="clUserBtn" onclick="clToggleDropdown(event)" aria-expanded="false" aria-haspopup="true">
-                        <div class="cl-user__avatar">
-                            {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+                        <div class="cl-user__avatar" style="overflow:hidden; padding:0;">
+                            @if(Auth::user()->avatar)
+                                <img src="{{ asset('storage/' . Auth::user()->avatar) }}"
+                                    alt="avatar"
+                                    style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+                            @else
+                                {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+                            @endif
                         </div>
                         <span class="cl-user__name">{{ Auth::user()->name }}</span>
                         <i class="bi bi-chevron-down cl-user__arrow"></i>
@@ -483,22 +527,22 @@
 
                     <div class="cl-dropdown" id="clDropdown" role="menu">
                         <a href="{{ route('dashboard') }}" class="cl-dropdown__item">
-                            <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                            <i class="bi bi-grid-1x2-fill"></i> {{ __('Dashboard') }}
                         </a>
                         <a href="{{ route('profile.edit') }}" class="cl-dropdown__item">
-                            <i class="bi bi-person-fill"></i> Mon profil
+                            <i class="bi bi-person-fill"></i> {{ __('Mon profil') }}
                         </a>
                         @if(Auth::user()->isAdmin())
                             <div class="cl-dropdown__sep"></div>
                             <a href="{{ route('admin.index') }}" class="cl-dropdown__item cl-dropdown__item--admin">
-                                <i class="bi bi-gear-fill"></i> Panel Admin
+                                <i class="bi bi-gear-fill"></i> {{ __('Panel Admin') }}
                             </a>
                         @endif
                         <div class="cl-dropdown__sep"></div>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="cl-dropdown__item cl-dropdown__item--danger">
-                                <i class="bi bi-box-arrow-right"></i> Déconnexion
+                                <i class="bi bi-box-arrow-right"></i> {{ __('Déconnexion') }}
                             </button>
                         </form>
                     </div>
@@ -509,8 +553,18 @@
                     <i class="bi bi-sun-fill icon-sun"></i>
                 </button>
 
-                <a href="{{ route('login') }}" class="cl-btn cl-btn--ghost">Connexion</a>
-                <a href="{{ route('register') }}" class="cl-btn cl-btn--primary">S'inscrire</a>
+                {{-- Language Switcher Desktop (non connecté) --}}
+                <div class="lang-switcher d-none d-lg-flex">
+                    <a href="{{ route('lang.switch', 'fr') }}"
+                       class="lang-btn {{ app()->getLocale() === 'fr' ? 'lang-btn--active' : '' }}"
+                       title="Français">🇫🇷</a>
+                    <a href="{{ route('lang.switch', 'en') }}"
+                       class="lang-btn {{ app()->getLocale() === 'en' ? 'lang-btn--active' : '' }}"
+                       title="English">🇬🇧</a>
+                </div>
+
+                <a href="{{ route('login') }}" class="cl-btn cl-btn--ghost">{{ __('Connexion') }}</a>
+                <a href="{{ route('register') }}" class="cl-btn cl-btn--primary">{{ __("S'inscrire") }}</a>
             @endauth
 
             <button class="cl-burger" id="clBurger" onclick="clToggleBurger()" aria-label="Menu" aria-expanded="false">
@@ -522,26 +576,35 @@
 </nav>
 
 <div class="cl-mobile" id="clMobile" aria-hidden="true">
+
+    {{-- Dark mode + Language switcher mobile --}}
     <div class="d-flex align-items-center gap-2 mb-2 d-lg-none">
         <button class="dark-toggle-nav" onclick="clToggleDark()" aria-label="Mode sombre">
             <i class="bi bi-moon-stars-fill icon-moon"></i>
             <i class="bi bi-sun-fill icon-sun"></i>
         </button>
+        <div class="lang-switcher">
+            <a href="{{ route('lang.switch', 'fr') }}"
+               class="lang-btn {{ app()->getLocale() === 'fr' ? 'lang-btn--active' : '' }}">🇫🇷</a>
+            <a href="{{ route('lang.switch', 'en') }}"
+               class="lang-btn {{ app()->getLocale() === 'en' ? 'lang-btn--active' : '' }}">🇬🇧</a>
+        </div>
     </div>
+
     <a href="{{ route('associations.index') }}" class="cl-mobile__link {{ request()->routeIs('associations.*') ? 'active' : '' }}">
-        <i class="bi bi-building"></i> Associations
+        <i class="bi bi-building"></i> {{ __('Associations') }}
     </a>
     <a href="{{ route('campaigns.index') }}" class="cl-mobile__link {{ request()->routeIs('campaigns.*') ? 'active' : '' }}">
-        <i class="bi bi-megaphone-fill"></i> Campagnes
+        <i class="bi bi-megaphone-fill"></i> {{ __('Campagnes') }}
     </a>
     <a href="{{ route('taches.index') }}" class="cl-mobile__link {{ request()->routeIs('taches.*') ? 'active' : '' }}">
-        <i class="bi bi-hand-index-thumb"></i> Bénévolat
+        <i class="bi bi-hand-index-thumb"></i> {{ __('Bénévolat') }}
     </a>
     <a href="{{ route('besoins.index') }}" class="cl-mobile__link {{ request()->routeIs('besoins.*') ? 'active' : '' }}">
-        <i class="bi bi-life-preserver"></i> Besoin d'aide
+        <i class="bi bi-life-preserver"></i> {{ __("Besoin d'aide") }}
     </a>
     <a href="{{ route('chatbot.index') }}" class="cl-mobile__link {{ request()->routeIs('chatbot.*') ? 'active' : '' }}">
-        <i class="bi bi-robot"></i> Assistant IA
+        <i class="bi bi-robot"></i> {{ __('Assistant IA') }}
     </a>
 
     <div class="cl-mobile__sep"></div>
@@ -549,33 +612,33 @@
     <div class="cl-mobile__actions">
         @auth
             <a href="{{ route('notifications.index') }}" class="cl-mobile__link">
-                <i class="bi bi-bell-fill"></i> Notifications
+                <i class="bi bi-bell-fill"></i> {{ __('Notifications') }}
                 @if($notifCount > 0)
                     <span class="badge rounded-pill" style="background:var(--cl-red);font-size:0.65rem;">{{ $notifCount }}</span>
                 @endif
             </a>
             <a href="{{ route('dashboard') }}" class="cl-btn cl-btn--ghost cl-btn--full">
-                <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                <i class="bi bi-grid-1x2-fill"></i> {{ __('Dashboard') }}
             </a>
             <a href="{{ route('profile.edit') }}" class="cl-btn cl-btn--ghost cl-btn--full">
-                <i class="bi bi-person-fill"></i> Mon profil
+                <i class="bi bi-person-fill"></i> {{ __('Mon profil') }}
             </a>
             @if(Auth::user()->isAdmin())
                 <a href="{{ route('admin.index') }}" class="cl-btn cl-btn--full"
                    style="color:#BFA14A;border:1px solid rgba(191,161,74,0.3);background:rgba(191,161,74,0.06);">
-                    <i class="bi bi-gear-fill"></i> Panel Admin
+                    <i class="bi bi-gear-fill"></i> {{ __('Panel Admin') }}
                 </a>
             @endif
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="cl-btn cl-btn--full"
                         style="background:rgba(230,57,70,0.08);color:#ef5350;border:1px solid rgba(230,57,70,0.2);">
-                    <i class="bi bi-box-arrow-right"></i> Déconnexion
+                    <i class="bi bi-box-arrow-right"></i> {{ __('Déconnexion') }}
                 </button>
             </form>
         @else
-            <a href="{{ route('login') }}" class="cl-btn cl-btn--ghost cl-btn--full">Connexion</a>
-            <a href="{{ route('register') }}" class="cl-btn cl-btn--primary cl-btn--full">S'inscrire</a>
+            <a href="{{ route('login') }}" class="cl-btn cl-btn--ghost cl-btn--full">{{ __('Connexion') }}</a>
+            <a href="{{ route('register') }}" class="cl-btn cl-btn--primary cl-btn--full">{{ __("S'inscrire") }}</a>
         @endauth
     </div>
 </div>

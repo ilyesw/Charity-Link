@@ -9,18 +9,12 @@ class Association extends Model
 {
     use HasFactory;
 
+    // app/Models/Association.php
     protected $fillable = [
-        'user_id',
-        'name',
-        'description',
-        'category',
-        'region',
-        'logo',
-        'document_justif',
-        'status',
-        'rejection_reason',
-        'website',
-        'facebook',
+        'user_id', 'name', 'description', 'category', 'region',
+        'phone_mobile', 'phone_fix', 'email',
+        'logo', 'doc_rne', 'doc_fiscal',
+        'website', 'facebook', 'status', 'rejection_reason',
     ];
 
     // Relation avec User

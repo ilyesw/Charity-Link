@@ -63,8 +63,14 @@
 
                             <!-- Avatar + Name -->
                             <div class="assoc-header">
-                                <div class="assoc-avatar">
-                                    <i class="bi bi-building"></i>
+                                <div class="assoc-avatar" style="overflow:hidden; padding:0;">
+                                    @if($association->logo)
+                                        <img src="{{ asset('storage/' . $association->logo) }}"
+                                            alt="{{ $association->name }}"
+                                            style="width:100%; height:100%; object-fit:cover; border-radius:var(--radius-md);">
+                                    @else
+                                        <i class="bi bi-building"></i>
+                                    @endif
                                 </div>
                                 <div>
                                     <h5 class="assoc-name">{{ $association->name }}</h5>

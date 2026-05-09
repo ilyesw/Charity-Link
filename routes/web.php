@@ -10,6 +10,7 @@ use App\Http\Controllers\TacheController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 
 Route::get('/', function () {
     return view('welcome');
@@ -23,6 +24,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar');//zedtou
 });
 
 // Routes Associations
@@ -103,6 +105,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('taches.postuler');
     Route::post('/taches/{tache}/compte-rendu', [TacheController::class, 'compte_rendu'])
         ->name('taches.compte_rendu');
+    Route::post('/taches/{tache}/archiver', [TacheController::class, 'archiver'])
+        ->name('taches.archiver'); // ← AJOUTER
 });
 
 // Routes Admin
@@ -116,6 +120,11 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])
             ->name('associations.valider');
         Route::post('/associations/{association}/rejeter', [AdminController::class, 'rejeterAssociation'])
             ->name('associations.rejeter');
+        Route::post('/besoins/{besoin}/valider', [AdminController::class, 'validerBesoin'])
+            ->name('besoins.valider');
+        Route::post('/besoins/{besoin}/rejeter', [AdminController::class, 'rejeterBesoin'])
+            ->name('besoins.rejeter');
+        //Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar');
     });
 
 // Routes Chatbot
@@ -131,5 +140,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notifications/count', [NotificationController::class, 'count'])
         ->name('notifications.count');
 });
+
+// Language switcher
+Route::get('/lang/{locale}', function ($locale) {
+    if (in_array($locale, ['fr', 'en'])) {
+        Session::put('locale', $locale);
+    }
+    return redirect()->back();
+})->name('lang.switch');
 
 require __DIR__.'/auth.php';

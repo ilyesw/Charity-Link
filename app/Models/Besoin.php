@@ -20,6 +20,12 @@ class Besoin extends Model
         'status',
         'association_id',
         'admin_note',
+        'is_anonymous',   // ✅ Feature 2
+        'attachment',     // ✅ Feature 3
+    ];
+
+    protected $casts = [
+        'is_anonymous' => 'boolean',
     ];
 
     // Relation avec Association
@@ -28,9 +34,21 @@ class Besoin extends Model
         return $this->belongsTo(Association::class);
     }
 
+    // ✅ Nom affiché publiquement (anonyme ou réel)
+    public function getNomPublicAttribute(): string
+    {
+        return $this->is_anonymous ? 'Anonyme' : $this->nom;
+    }
+
     // Scopes
     public function scopeEnAttente($query)
     {
         return $query->where('status', 'en_attente');
+    }
+
+    // ✅ Feature 1 : Scope — visible publiquement (validées seulement)
+    public function scopeValides($query)
+    {
+        return $query->whereIn('status', ['validee', 'pris_en_charge', 'resolu']);
     }
 }

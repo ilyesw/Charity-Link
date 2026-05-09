@@ -83,4 +83,16 @@ class NotificationHelper
             '/admin'
         );
     }
+
+    // Notification nouvelle association soumise (admin)
+    public static function associationSoumise(int $adminId, string $associationName)
+    {
+        self::send(
+            $adminId,
+            '🏢 Nouvelle association à valider !',
+            "L'association \"{$associationName}\" a été soumise et attend votre validation.",
+            'validation',
+            '/admin'
+        );
+    }
 }
