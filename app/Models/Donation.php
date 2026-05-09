@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -22,17 +21,28 @@ class Donation extends Model
         'competence_desc',
         'message',
         'status',
+        // ✅ Nouveaux champs
+        'type_don',
+        'description_nature',
+        'quantite',
+        'valeur_estimee',
+        'justificatif',
+        'is_anonymous',
+        'display_name',
     ];
 
-    // Relation avec User
-    public function user()
+    protected $casts = [
+        'is_anonymous'  => 'boolean',
+        'valeur_estimee' => 'decimal:2',
+    ];
+
+    // Nom affiché publiquement
+    public function nomPublic()
     {
-        return $this->belongsTo(User::class);
+        if ($this->is_anonymous) return 'Anonyme';
+        return $this->display_name ?? 'Anonyme';
     }
 
-    // Relation avec Campaign
-    public function campaign()
-    {
-        return $this->belongsTo(Campaign::class);
-    }
+    public function user()     { return $this->belongsTo(User::class); }
+    public function campaign() { return $this->belongsTo(Campaign::class); }
 }

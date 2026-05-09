@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +10,7 @@ class Tache extends Model
 
     protected $fillable = [
         'association_id',
+        'campaign_id',      // ✅ NOUVEAU
         'benevole_id',
         'title',
         'description',
@@ -20,27 +20,18 @@ class Tache extends Model
         'feedback',
         'compte_rendu',
         'note_association',
-        'is_archived',   // ✅ AJOUTÉ
+        'is_archived',
     ];
 
     protected $casts = [
         'deadline'    => 'date',
-        'is_archived' => 'boolean',  // ✅ AJOUTÉ — 0/1 devient true/false
+        'is_archived' => 'boolean',
     ];
 
-    // Relation avec Association
-    public function association()
-    {
-        return $this->belongsTo(Association::class);
-    }
+    public function association() { return $this->belongsTo(Association::class); }
+    public function benevole()    { return $this->belongsTo(User::class, 'benevole_id'); }
+    public function campaign()    { return $this->belongsTo(Campaign::class); }  // ✅ NOUVEAU
 
-    // Relation avec Bénévole (User)
-    public function benevole()
-    {
-        return $this->belongsTo(User::class, 'benevole_id');
-    }
-
-    // Scopes
     public function scopeOuverte($query)
     {
         return $query->where('status', 'ouverte');
