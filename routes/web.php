@@ -58,6 +58,22 @@ Route::delete('/campaigns/{campaign}', [CampaignController::class, 'destroy'])
     ->name('campaigns.destroy')->middleware('auth');
 Route::get('/campaigns/{campaign}', [CampaignController::class, 'show'])
     ->name('campaigns.show');
+// ===== Ajouter dans web.php après les routes campaigns existantes =====
+
+// Photos galerie
+Route::delete('/campaigns/photos/{photo}', [CampaignController::class, 'deletePhoto'])
+    ->name('campaigns.photos.delete');
+
+// Transactions (entrées/sorties)
+Route::post('/campaigns/{campaign}/transactions', [CampaignController::class, 'storeTransaction'])
+    ->name('campaigns.transactions.store');
+Route::delete('/campaigns/transactions/{transaction}', [CampaignController::class, 'deleteTransaction'])
+    ->name('campaigns.transactions.delete');
+
+// Notation ⭐
+Route::post('/campaigns/{campaign}/rate', [CampaignController::class, 'rate'])
+    ->name('campaigns.rate');
+
 
 // Routes Besoins
 Route::get('/besoins', [BesoinController::class, 'index'])
