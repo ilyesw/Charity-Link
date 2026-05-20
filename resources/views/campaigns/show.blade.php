@@ -7,9 +7,18 @@
         </div>
     </x-slot>
 
-    <a href="{{ route('campaigns.index') }}" class="show-back">
-        <i class="bi bi-arrow-left"></i> Retour aux campagnes
-    </a>
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem;">
+        <a href="{{ route('campaigns.index') }}" class="show-back" style="margin-bottom:0;">
+            <i class="bi bi-arrow-left"></i> Retour aux campagnes
+        </a>
+        <a href="{{ route('campaigns.transparence', $campaign) }}"
+        target="_blank"
+        style="display:inline-flex; align-items:center; gap:0.4rem; font-size:0.82rem; font-weight:600; color:var(--cl-muted); text-decoration:none; padding:0.45rem 0.9rem; border:1.5px solid var(--cl-border); border-radius:var(--radius-md); transition:all 0.2s ease; background:var(--cl-card-bg);"
+        onmouseover="this.style.color='#1A8C38'; this.style.borderColor='#2DC653';"
+        onmouseout="this.style.color=''; this.style.borderColor='';">
+            <i class="bi bi-shield-check"></i> Transparence publique
+        </a>
+    </div>
 
     @if(session('success'))
         <div class="show-flash show-flash--success">
@@ -142,6 +151,125 @@
                 </div>
             @endif
 
+            {{-- ═══ TÂCHES LIÉES À LA CAMPAGNE ═══ --}}
+            <div class="show-main-card mt-3">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="show-section-title mb-0">
+                        <i class="bi bi-list-check"></i>
+                        Missions bénévoles
+                        @if($campaign->taches->count() > 0)
+                            <span class="show-tache-count">{{ $campaign->taches->count() }}</span>
+                        @endif
+                    </h6>
+                    @auth
+                        @if(auth()->user()->id === $campaign->association->user_id)
+                            <button class="show-tache-add-btn" onclick="toggleTacheForm()" id="tacheToggleBtn">
+                                <i class="bi bi-plus-lg"></i> Ajouter une mission
+                            </button>
+                        @endif
+                    @endauth
+                </div>
+
+                {{-- Formulaire création tâche (association seulement) --}}
+                @auth
+                    @if(auth()->user()->id === $campaign->association->user_id)
+                        <div id="tacheForm" style="display:none;">
+                            <form method="POST" action="{{ route('taches.store') }}" class="show-tache-form">
+                                @csrf
+                                <input type="hidden" name="campaign_id" value="{{ $campaign->id }}">
+                                <div class="show-tache-grid mb-2">
+                                    <div>
+                                        <label class="fm-label-sm">Titre de la mission *</label>
+                                        <input type="text" name="title" class="fm-input fm-input--sm"
+                                            placeholder="Ex: Distribution couffins - Zone Nord" required>
+                                    </div>
+                                    <div>
+                                        <label class="fm-label-sm">Compétence requise *</label>
+                                        <input type="text" name="competence_requise" class="fm-input fm-input--sm"
+                                            placeholder="Ex: Logistique, Communication..." required>
+                                    </div>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="fm-label-sm">Description *</label>
+                                    <textarea name="description" class="fm-input fm-input--sm" rows="2"
+                                        placeholder="Décrivez la mission et les responsabilités..." required></textarea>
+                                </div>
+                                <div class="show-tache-grid mb-3">
+                                    <div>
+                                        <label class="fm-label-sm">
+                                            Deadline
+                                            <span style="font-weight:400; color:var(--cl-muted);">optionnel</span>
+                                        </label>
+                                        <input type="date" name="deadline" class="fm-input fm-input--sm">
+                                    </div>
+                                    <div style="display:flex; align-items:flex-end;">
+                                        <button type="submit" class="fm-btn fm-btn--red fm-btn--sm w-100">
+                                            <i class="bi bi-plus-circle"></i> Créer la mission
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    @endif
+                @endauth
+
+                {{-- Liste des tâches --}}
+                @if($campaign->taches->count() > 0)
+                    <div class="show-taches-list">
+                        @foreach($campaign->taches as $tache)
+                            <div class="show-tache-item">
+                                <div class="show-tache-left">
+                                    <div class="show-tache-status-dot show-tache-status-dot--{{ $tache->status }}"></div>
+                                    <div class="show-tache-body">
+                                        <span class="show-tache-title">{{ $tache->title }}</span>
+                                        <span class="show-tache-meta">
+                                            <i class="bi bi-tools"></i> {{ $tache->competence_requise }}
+                                            @if($tache->deadline)
+                                                &nbsp;·&nbsp;
+                                                <i class="bi bi-calendar3"></i> {{ $tache->deadline->format('d/m/Y') }}
+                                            @endif
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="show-tache-right">
+                                    @switch($tache->status)
+                                        @case('ouverte')
+                                            <span class="show-tache-badge show-tache-badge--open">Ouverte</span>
+                                            @auth
+                                                @if(auth()->user()->isBenevole() && !$tache->benevole_id)
+                                                    <form method="POST" action="{{ route('taches.postuler', $tache) }}" style="margin:0;">
+                                                        @csrf
+                                                        <button type="submit" class="show-tache-btn-postuler">
+                                                            <i class="bi bi-hand-index-thumb"></i> Postuler
+                                                        </button>
+                                                    </form>
+                                                @endif
+                                            @endauth
+                                            @break
+                                        @case('en_cours')
+                                            <span class="show-tache-badge show-tache-badge--progress">En cours</span>
+                                            @if($tache->benevole)
+                                                <span class="show-tache-benevole">
+                                                    <i class="bi bi-person-fill"></i> {{ $tache->benevole->name }}
+                                                </span>
+                                            @endif
+                                            @break
+                                        @case('validee')
+                                            <span class="show-tache-badge show-tache-badge--done">Validée ✓</span>
+                                            @break
+                                    @endswitch
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="show-tache-empty">
+                        <i class="bi bi-people"></i>
+                        <span>Aucune mission bénévole pour cette campagne.</span>
+                    </div>
+                @endif
+            </div>
+
             {{-- ═══ TRANSPARENCE FINANCIÈRE ═══ --}}
             <div class="show-main-card mt-3">
                 <h6 class="show-section-title"><i class="bi bi-eye"></i> Transparence financière</h6>
@@ -188,11 +316,15 @@
                                                 placeholder="Montant" min="0" step="0.01" required>
                                             <span class="fm-input-suffix" style="font-size:0.75rem;">DT</span>
                                         </div>
+                                        @error('montant')
+                                            <p style="color:red; font-size:0.75rem; margin-top:0.25rem;">{{ $message }}</p>
+                                        @enderror
                                     </div>
                                 </div>
                                 <div class="fm-row" style="margin-top:0.6rem;">
                                     <div>
-                                        <input type="date" name="date_transaction" class="fm-input fm-input--sm" required>
+                                        <input type="date" name="date_transaction" class="fm-input fm-input--sm"
+                                            min="2000-01-01" max="2100-12-31" required>
                                     </div>
                                     <div>
                                         <input type="file" name="justificatif" class="fm-input fm-input--sm fm-input-file"
@@ -265,7 +397,6 @@
                     @endif
                 </h6>
 
-                {{-- Étoiles affichage --}}
                 <div class="show-stars-display">
                     @for($i = 1; $i <= 5; $i++)
                         <i class="bi bi-star{{ $avgRating >= $i ? '-fill' : ($avgRating >= $i - 0.5 ? '-half' : '') }}"
@@ -273,7 +404,6 @@
                     @endfor
                 </div>
 
-                {{-- Formulaire notation --}}
                 @auth
                     <form method="POST" action="{{ route('campaigns.rate', $campaign) }}" class="show-rate-form">
                         @csrf
@@ -413,11 +543,41 @@
         .show-gallery-item img { width:100%; height:100%; object-fit:cover; }
         .show-gallery-delete { position:absolute; top:4px; right:4px; background:rgba(0,0,0,0.5); color:#fff; border:none; border-radius:50%; width:22px; height:22px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:0.7rem; }
 
+        /* Tâches */
+        .show-tache-count { background:var(--cl-red-glow); color:var(--cl-red); font-size:0.72rem; font-weight:700; padding:0.15rem 0.5rem; border-radius:var(--radius-full); margin-left:0.4rem; }
+        .show-tache-add-btn { display:inline-flex; align-items:center; gap:0.3rem; font-size:0.8rem; font-weight:600; color:var(--cl-red); background:var(--cl-red-glow); border:1px solid rgba(230,57,70,0.15); border-radius:var(--radius-sm); padding:0.35rem 0.8rem; cursor:pointer; transition:all 0.2s ease; }
+        .show-tache-add-btn:hover { background:var(--cl-red); color:#fff; }
+        .show-tache-form { background:var(--cl-light); border:1px solid var(--cl-border); border-radius:var(--radius-md); padding:1rem; margin-bottom:1rem; }
+        .show-tache-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; }
+        .fm-label-sm { display:block; font-family:'Inter',sans-serif; font-weight:600; font-size:0.75rem; color:var(--cl-body); margin-bottom:0.3rem; }
+        .show-taches-list { display:flex; flex-direction:column; gap:0.5rem; }
+        .show-tache-item { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:0.85rem 1rem; background:var(--cl-light); border:1px solid var(--cl-border); border-radius:var(--radius-md); transition:all 0.2s ease; }
+        .show-tache-item:hover { border-color:var(--cl-red); background:var(--cl-red-glow); }
+        .show-tache-left { display:flex; align-items:center; gap:0.75rem; flex:1; min-width:0; }
+        .show-tache-status-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+        .show-tache-status-dot--ouverte { background:var(--cl-green); box-shadow:0 0 0 3px rgba(45,198,83,0.2); }
+        .show-tache-status-dot--en_cours { background:#f59e0b; box-shadow:0 0 0 3px rgba(245,158,11,0.2); }
+        .show-tache-status-dot--validee { background:var(--cl-muted); }
+        .show-tache-body { min-width:0; }
+        .show-tache-title { display:block; font-size:0.88rem; font-weight:600; color:var(--cl-dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .show-tache-meta { display:flex; align-items:center; gap:0.3rem; font-size:0.73rem; color:var(--cl-muted); margin-top:0.15rem; flex-wrap:wrap; }
+        .show-tache-meta i { font-size:0.7rem; color:var(--cl-red); }
+        .show-tache-right { display:flex; align-items:center; gap:0.5rem; flex-shrink:0; }
+        .show-tache-badge { font-size:0.7rem; font-weight:700; padding:0.25rem 0.6rem; border-radius:var(--radius-full); white-space:nowrap; }
+        .show-tache-badge--open { background:var(--cl-green-soft); color:var(--cl-green); }
+        .show-tache-badge--progress { background:rgba(245,158,11,0.12); color:#b45309; }
+        .show-tache-badge--done { background:var(--cl-light); color:var(--cl-muted); border:1px solid var(--cl-border); }
+        .show-tache-btn-postuler { display:inline-flex; align-items:center; gap:0.3rem; font-size:0.78rem; font-weight:700; background:var(--cl-red); color:#fff; border:none; border-radius:var(--radius-full); padding:0.35rem 0.85rem; cursor:pointer; transition:all 0.2s ease; white-space:nowrap; }
+        .show-tache-btn-postuler:hover { background:var(--cl-red-hover); transform:translateY(-1px); }
+        .show-tache-benevole { font-size:0.75rem; color:var(--cl-muted); display:flex; align-items:center; gap:0.25rem; }
+        .show-tache-empty { display:flex; align-items:center; gap:0.6rem; padding:1.25rem; color:var(--cl-muted); font-size:0.85rem; justify-content:center; }
+        .show-tache-empty i { font-size:1.2rem; color:var(--cl-border); }
+
         /* Finance */
         .show-finance-summary { display:grid; grid-template-columns:repeat(3,1fr); gap:0.75rem; margin-bottom:1.25rem; }
         .show-finance-item { padding:0.85rem; border-radius:var(--radius-md); text-align:center; }
         .show-finance-item--green { background:var(--cl-green-soft); }
-        .show-finance-item--red { background:var(--cl-red-soft); }
+        .show-finance-item--red { background:var(--cl-red-soft, var(--cl-red-glow)); }
         .show-finance-item--blue { background:var(--cl-blue-soft); }
         .show-finance-label { display:block; font-size:0.72rem; font-weight:600; color:var(--cl-muted); margin-bottom:0.25rem; }
         .show-finance-val { display:block; font-size:0.95rem; font-weight:800; color:var(--cl-dark); }
@@ -492,6 +652,26 @@
         .fm-btn--red { background:var(--cl-red); color:#fff; }
         .fm-btn--red:hover { background:var(--cl-red-hover); color:#fff; }
         .fm-btn--sm { padding:0.45rem 1rem; font-size:0.8rem; }
-        @media (max-width:767.98px) { .show-finance-summary { grid-template-columns:1fr; } .show-gallery { grid-template-columns:repeat(2,1fr); } .fm-row-3 { grid-template-columns:1fr; } .show-dates-row { flex-direction:column; } }
+        @media (max-width:767.98px) {
+            .show-finance-summary { grid-template-columns:1fr; }
+            .show-gallery { grid-template-columns:repeat(2,1fr); }
+            .fm-row-3 { grid-template-columns:1fr; }
+            .show-dates-row { flex-direction:column; }
+            .show-tache-grid { grid-template-columns:1fr; }
+            .show-tache-item { flex-direction:column; align-items:flex-start; gap:0.5rem; }
+            .show-tache-right { width:100%; justify-content:flex-end; }
+        }
     </style>
+
+    <script>
+    function toggleTacheForm() {
+        const form = document.getElementById('tacheForm');
+        const btn  = document.getElementById('tacheToggleBtn');
+        const open = form.style.display === 'none' || form.style.display === '';
+        form.style.display = open ? 'block' : 'none';
+        btn.innerHTML = open
+            ? '<i class="bi bi-x-lg"></i> Annuler'
+            : '<i class="bi bi-plus-lg"></i> Ajouter une mission';
+    }
+    </script>
 </x-app-layout>

@@ -79,6 +79,29 @@
         </div>
     </div>
 
+    {{-- ═══════════ EXPORT DONS ═══════════ --}}
+    <div class="ad-export-card mb-4">
+        <div class="ad-export-left">
+            <div class="ad-chart-icon ad-chart-icon--red">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div>
+                <div class="ad-chart-title">Export des dons</div>
+                <div class="ad-chart-sub">Télécharger la liste complète des dons</div>
+            </div>
+        </div>
+        <div class="ad-export-btns">
+            <a href="{{ route('admin.dons.export-excel') }}" class="btn-export btn-export--green">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                Excel
+            </a>
+            <a href="{{ route('admin.dons.export-pdf') }}" class="btn-export btn-export--red">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                PDF
+            </a>
+        </div>
+    </div>
+
     {{-- ✅ Section Besoins en attente --}}
     <div class="ad-pending-card mb-4">
         <div class="ad-pending-head">
@@ -279,6 +302,167 @@
         @endif
     </div>
 
+
+    {{-- ═══════════ GRAPHIQUES ═══════════ --}}
+    <div class="ad-charts-section">
+        <div class="ad-charts-grid">
+
+            <div class="ad-chart-card ad-chart-card--wide">
+                <div class="ad-chart-head">
+                    <div class="ad-chart-icon ad-chart-icon--red"><i class="bi bi-bar-chart-fill"></i></div>
+                    <div>
+                        <div class="ad-chart-title">Dons par mois</div>
+                        <div class="ad-chart-sub">6 derniers mois</div>
+                    </div>
+                </div>
+                <div style="position:relative; height:220px;">
+                    <canvas id="chartDons"></canvas>
+                </div>
+            </div>
+
+            <div class="ad-chart-card">
+                <div class="ad-chart-head">
+                    <div class="ad-chart-icon ad-chart-icon--green"><i class="bi bi-person-plus-fill"></i></div>
+                    <div>
+                        <div class="ad-chart-title">Inscriptions</div>
+                        <div class="ad-chart-sub">6 derniers mois</div>
+                    </div>
+                </div>
+                <div style="position:relative; height:200px;">
+                    <canvas id="chartUsers"></canvas>
+                </div>
+            </div>
+
+            <div class="ad-chart-card">
+                <div class="ad-chart-head">
+                    <div class="ad-chart-icon ad-chart-icon--blue"><i class="bi bi-pie-chart-fill"></i></div>
+                    <div>
+                        <div class="ad-chart-title">Types de dons</div>
+                        <div class="ad-chart-sub">Répartition</div>
+                    </div>
+                </div>
+                <div style="position:relative; height:200px;">
+                    <canvas id="chartTypes"></canvas>
+                </div>
+            </div>
+
+            <div class="ad-chart-card">
+                <div class="ad-chart-head">
+                    <div class="ad-chart-icon ad-chart-icon--orange"><i class="bi bi-building"></i></div>
+                    <div>
+                        <div class="ad-chart-title">Associations</div>
+                        <div class="ad-chart-sub">Par statut</div>
+                    </div>
+                </div>
+                <div style="position:relative; height:200px;">
+                    <canvas id="chartAssoc"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    Chart.defaults.color = '#8898aa';
+
+    const labels       = @json($labels);
+    const donsMois     = @json($donsMois);
+    const usersMois    = @json($usersMois);
+    const donsParType  = @json($donsParType);
+    const assocStatuts = @json($assocStatuts);
+
+    new Chart(document.getElementById('chartDons'), {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Dons',
+                data: donsMois,
+                backgroundColor: 'rgba(220,53,69,0.12)',
+                borderColor: '#dc3545',
+                borderWidth: 2,
+                borderRadius: 8,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(0,0,0,0.05)' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('chartUsers'), {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Inscriptions',
+                data: usersMois,
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40,167,69,0.08)',
+                borderWidth: 2.5,
+                pointBackgroundColor: '#28a745',
+                pointRadius: 4,
+                fill: true,
+                tension: 0.4,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(0,0,0,0.05)' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('chartTypes'), {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(donsParType),
+            datasets: [{
+                data: Object.values(donsParType),
+                backgroundColor: ['#dc3545','#1a6fc4','#28a745','#f5a623','#8c54fb'],
+                borderWidth: 0,
+                hoverOffset: 8,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: { legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true } } }
+        }
+    });
+
+    new Chart(document.getElementById('chartAssoc'), {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(assocStatuts),
+            datasets: [{
+                data: Object.values(assocStatuts),
+                backgroundColor: ['#28a745','#f5a623','#dc3545'],
+                borderWidth: 0,
+                hoverOffset: 8,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: { legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true } } }
+        }
+    });
+    </script>
+
 </x-app-layout>
 
 <style>
@@ -362,4 +546,33 @@
         .ad-reject-row { flex: 1; }
         .ad-reject-input { flex: 1; width: auto; }
     }
+
+    /* ── Charts ── */
+    .ad-charts-section { margin-top: 1.5rem; margin-bottom: 2rem; }
+    .ad-charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    .ad-chart-card { background: var(--cl-card-bg); border: 1px solid var(--cl-card-border); border-radius: var(--radius-xl); padding: 1.35rem; box-shadow: var(--shadow-xs); }
+    .ad-chart-card--wide { grid-column: 1 / -1; }
+    .ad-chart-head { display: flex; align-items: center; gap: .85rem; margin-bottom: 1.25rem; }
+    .ad-chart-icon { width: 38px; height: 38px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem; }
+    .ad-chart-icon--red    { background: var(--cl-red-glow);   color: var(--cl-red); }
+    .ad-chart-icon--blue   { background: var(--cl-blue-mid);   color: var(--cl-blue); }
+    .ad-chart-icon--green  { background: var(--cl-green-glow); color: var(--cl-green); }
+    .ad-chart-icon--orange { background: rgba(245,166,35,.1);  color: #D4940A; }
+    .ad-chart-title { font-weight: 700; font-size: .92rem; color: var(--cl-dark); }
+    .ad-chart-sub   { font-size: .75rem; color: var(--cl-muted); }
+    @media (max-width: 767.98px) {
+        .ad-charts-grid { grid-template-columns: 1fr; }
+        .ad-chart-card--wide { grid-column: 1; }
+    }
+
+    /* ── Export ── */
+    .ad-export-card { display:flex; align-items:center; justify-content:space-between; background:var(--cl-card-bg); border:1px solid var(--cl-card-border); border-radius:var(--radius-xl); padding:1.1rem 1.35rem; box-shadow:var(--shadow-xs); }
+    .ad-export-left { display:flex; align-items:center; gap:.85rem; }
+    .ad-export-btns { display:flex; gap:.6rem; }
+    .btn-export { display:inline-flex; align-items:center; gap:.4rem; padding:.45rem 1.1rem; border-radius:var(--radius-full); font-size:.82rem; font-weight:600; text-decoration:none; transition:all .2s ease; }
+    .btn-export--green { background:rgba(40,167,69,.1); color:#1A8C38; border:1px solid rgba(40,167,69,.2); }
+    .btn-export--green:hover { background:rgba(40,167,69,.18); transform:translateY(-1px); }
+    .btn-export--red { background:var(--cl-red-soft); color:var(--cl-red); border:1px solid rgba(220,53,69,.2); }
+    .btn-export--red:hover { background:rgba(220,53,69,.15); transform:translateY(-1px); }
+    @media (max-width:767.98px) { .ad-export-card { flex-direction:column; align-items:flex-start; gap:.85rem; } }
 </style>

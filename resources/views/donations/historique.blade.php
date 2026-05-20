@@ -65,12 +65,17 @@
                                 <small class="ls-card-sub">{{ $donation->campaign->association->name }}</small>
                             </div>
 
-                            {{-- Statut + Date --}}
+                            {{-- ✅ Statut + Date --}}
                             <div class="ls-card-meta">
                                 @if($donation->status === 'confirme')
                                     <span class="ls-badge ls-badge--green">
                                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                                         Confirmé
+                                    </span>
+                                @elseif($donation->status === 'annule')
+                                    <span class="ls-badge ls-badge--red">
+                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                                        Refusé
                                     </span>
                                 @else
                                     <span class="ls-badge ls-badge--orange">
@@ -196,8 +201,8 @@
         flex-shrink: 0;
     }
     .ls-card-avatar--finance { background: rgba(230,57,70,0.08); color: var(--cl-red); }
-    .ls-card-avatar--nature { background: rgba(45,198,83,0.08); color: var(--cl-green); }
-    .ls-card-avatar--skill { background: rgba(29,53,87,0.08); color: var(--cl-blue); }
+    .ls-card-avatar--nature  { background: rgba(45,198,83,0.08);  color: var(--cl-green); }
+    .ls-card-avatar--skill   { background: rgba(29,53,87,0.08);   color: var(--cl-blue); }
     html.dark .ls-card-avatar--skill { color: #93bbfd; }
 
     .ls-card-info { flex: 1; min-width: 0; }
@@ -214,14 +219,13 @@
         font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.72rem;
         border-radius: var(--radius-full);
     }
-    .ls-badge--green { background: var(--cl-green-soft); color: #1A8C38; }
-    .ls-badge--orange { background: rgba(245,166,35,0.1); color: #B8860B; }
+    .ls-badge--green  { background: var(--cl-green-soft);          color: #1A8C38; }
+    .ls-badge--orange { background: rgba(245,166,35,0.1);           color: #B8860B; }
+    .ls-badge--red    { background: var(--cl-red-soft);             color: var(--cl-red); }
 
     .ls-tag {
         display: inline-flex; align-items: center; gap: 0.3rem;
         padding: 0.2rem 0.6rem;
-        background: var(--cl-red-glow);
-        color: var(--cl-red);
         border-radius: var(--radius-full);
         font-size: 0.72rem; font-weight: 600;
     }

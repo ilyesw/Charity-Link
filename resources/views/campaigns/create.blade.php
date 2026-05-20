@@ -105,15 +105,19 @@
                                     <label class="fm-label">Date de début <span class="fm-section-optional">optionnel</span></label>
                                     <div class="fm-input-icon-wrap">
                                         <i class="bi bi-calendar-check"></i>
+                                        {{-- Après --}}
                                         <input type="date" name="date_debut" class="fm-input fm-input--has-icon"
-                                            value="{{ old('date_debut') }}">
+                                            min="{{ date('Y-m-d') }}" max="2100-12-31"
+                                            value="{{ old('date_debut', date('Y-m-d')) }}">
                                     </div>
                                 </div>
                                 <div class="fm-group">
                                     <label class="fm-label">Date limite <span class="fm-section-optional">optionnel</span></label>
                                     <div class="fm-input-icon-wrap">
                                         <i class="bi bi-calendar-event"></i>
+                                        {{-- Après --}}
                                         <input type="date" name="deadline" class="fm-input fm-input--has-icon"
+                                            min="{{ date('Y-m-d') }}" max="2100-12-31"
                                             value="{{ old('deadline') }}">
                                     </div>
                                 </div>

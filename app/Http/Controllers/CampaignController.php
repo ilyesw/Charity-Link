@@ -13,42 +13,56 @@ use Illuminate\Support\Facades\Storage;
 class CampaignController extends Controller
 {
     // ===================== LISTE PUBLIQUE =====================
+// ✅ Méthode index() — remplace l'ancienne dans CampaignController.php
+
     public function index()
     {
         $campaigns = Campaign::active()
-            ->with(['association', 'ratings'])
+            ->with('association')
+            ->withAvg('ratings', 'note')   // ← moyenne des notes
+            ->withCount('ratings')          // ← nombre d'avis
             ->latest()
             ->paginate(12);
+
         return view('campaigns.index', compact('campaigns'));
     }
 
     // ===================== DÉTAIL + TRANSPARENCE =====================
+
+    // ════════════════════════════════════════════════
+    // 2. CampaignController — remplace la méthode show()
+    //    (charge les tâches liées à la campagne)
+    // ════════════════════════════════════════════════
+
     public function show(Campaign $campaign)
     {
         $campaign->load([
-            'association', 'photos', 'ratings.user',
+            'photos',
             'transactions' => fn($q) => $q->orderBy('date_transaction', 'desc'),
-            'taches',
-            'donations' => fn($q) => $q->latest(),
+            'ratings',
+            'taches.benevole',   // ← nouveau : tâches avec le bénévole assigné
         ]);
 
-        $totalEntrees = $campaign->totalEntrees();
-        $totalSorties = $campaign->totalSorties();
-        $solde        = $campaign->solde();
-        $avgRating    = $campaign->averageRating();
+        $totalEntrees = $campaign->transactions->where('type', 'entree')->sum('montant');
+        $totalSorties = $campaign->transactions->where('type', 'sortie')->sum('montant');
+        $solde        = $totalEntrees - $totalSorties;
 
-        // Note de l'utilisateur connecté (si connecté)
-        $userRating = null;
-        if (Auth::check()) {
-            $userRating = $campaign->ratings()->where('user_id', Auth::id())->first();
-        }
+        $avgRating  = $campaign->ratings->avg('note')
+                    ? round($campaign->ratings->avg('note'), 1)
+                    : null;
+        $userRating = auth()->check()
+                    ? $campaign->ratings->where('user_id', auth()->id())->first()
+                    : null;
 
         return view('campaigns.show', compact(
-            'campaign', 'totalEntrees', 'totalSorties',
-            'solde', 'avgRating', 'userRating'
+            'campaign',
+            'totalEntrees',
+            'totalSorties',
+            'solde',
+            'avgRating',
+            'userRating'
         ));
     }
-
     // ===================== CRÉER =====================
     public function create()
     {
@@ -118,28 +132,32 @@ class CampaignController extends Controller
         return view('campaigns.edit', compact('campaign'));
     }
 
+    // ✅ Méthode update()
+
     public function update(Request $request, Campaign $campaign)
     {
-        if ($campaign->association->user_id !== Auth::id()) abort(403);
+        if ($campaign->association->user_id !== Auth::id()) {
+            abort(403);
+        }
 
         $request->validate([
-            'title'                => ['required', 'string', 'max:255'],
-            'nature'               => ['required', 'string', 'max:255'],
-            'description'          => ['required', 'string'],
-            'affiche'              => ['nullable', 'image', 'max:2048'],
-            'goal_amount'          => ['nullable', 'numeric', 'min:0'],
-            'objectif_description' => ['nullable', 'string', 'max:255'],
-            'date_debut'           => ['nullable', 'date'],
-            'deadline'             => ['nullable', 'date'],
-            'status'               => ['required', 'in:active,terminee,suspendue'],
-            'compte_rendu'         => ['nullable', 'string'],
-            'photos.*'             => ['nullable', 'image', 'max:2048'],
+            'title'                 => ['required', 'string', 'max:255'],
+            'description'           => ['required', 'string'],
+            'nature'                => ['nullable', 'string', 'max:255'],
+            'goal_amount'           => ['nullable', 'numeric', 'min:1'],
+            'objectif_description'  => ['nullable', 'string', 'max:500'],
+            'date_debut'            => ['nullable', 'date'],
+            'deadline'              => ['nullable', 'date'],
+            'status'                => ['required', 'in:active,terminee,suspendue'],
+            'compte_rendu'          => ['nullable', 'string'],
+            'affiche'               => ['nullable', 'image', 'max:5120'],
+            'photos.*'              => ['nullable', 'image', 'max:5120'],
         ]);
 
         $data = [
             'title'                => $request->title,
-            'nature'               => $request->nature,
             'description'          => $request->description,
+            'nature'               => $request->nature,
             'goal_amount'          => $request->goal_amount,
             'objectif_description' => $request->objectif_description,
             'date_debut'           => $request->date_debut,
@@ -148,46 +166,45 @@ class CampaignController extends Controller
             'compte_rendu'         => $request->compte_rendu,
         ];
 
-        // Nouvelle affiche
+        // Affiche — remplace l'ancienne si nouvelle uploadée
         if ($request->hasFile('affiche')) {
-            if ($campaign->affiche) Storage::disk('public')->delete($campaign->affiche);
+            if ($campaign->affiche) {
+                Storage::disk('public')->delete($campaign->affiche);
+            }
             $data['affiche'] = $request->file('affiche')->store('campaigns/affiches', 'public');
         }
 
         $campaign->update($data);
 
-        // Nouvelles photos galerie
+        // Nouvelles photos de galerie
         if ($request->hasFile('photos')) {
             foreach ($request->file('photos') as $photo) {
                 $path = $photo->store('campaigns/photos', 'public');
-                CampaignPhoto::create([
-                    'campaign_id' => $campaign->id,
-                    'path'        => $path,
-                ]);
+                $campaign->photos()->create(['path' => $path]);
             }
         }
 
         return redirect()->route('campaigns.show', $campaign)
-            ->with('success', 'Campagne mise à jour !');
+            ->with('success', 'Campagne mise à jour avec succès !');
     }
 
-    // ===================== SUPPRIMER =====================
-    public function destroy(Campaign $campaign)
-    {
-        if ($campaign->association->user_id !== Auth::id()) abort(403);
-        $campaign->delete();
-        return redirect()->route('campaigns.index')
-            ->with('success', 'Campagne supprimée.');
-    }
+        // ===================== SUPPRIMER =====================
+        public function destroy(Campaign $campaign)
+        {
+            if ($campaign->association->user_id !== Auth::id()) abort(403);
+            $campaign->delete();
+            return redirect()->route('campaigns.index')
+                ->with('success', 'Campagne supprimée.');
+        }
 
-    // ===================== SUPPRIMER UNE PHOTO =====================
-    public function deletePhoto(CampaignPhoto $photo)
-    {
-        if ($photo->campaign->association->user_id !== Auth::id()) abort(403);
-        Storage::disk('public')->delete($photo->path);
-        $photo->delete();
-        return back()->with('success', 'Photo supprimée.');
-    }
+        // ===================== SUPPRIMER UNE PHOTO =====================
+        public function deletePhoto(CampaignPhoto $photo)
+        {
+            if ($photo->campaign->association->user_id !== Auth::id()) abort(403);
+            Storage::disk('public')->delete($photo->path);
+            $photo->delete();
+            return back()->with('success', 'Photo supprimée.');
+        }
 
     // ===================== TRANSACTIONS (ENTRÉES/SORTIES) =====================
     public function storeTransaction(Request $request, Campaign $campaign)
@@ -201,6 +218,18 @@ class CampaignController extends Controller
             'date_transaction' => ['required', 'date'],
             'justificatif'     => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:4096'],
         ]);
+
+        if ($request->type === 'sortie') {
+            $totalEntrees = $campaign->transactions()->where('type', 'entree')->sum('montant');
+            $totalSorties = $campaign->transactions()->where('type', 'sortie')->sum('montant');
+            $soldeActuel  = $totalEntrees - $totalSorties;
+
+            if ($request->montant > $soldeActuel) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['montant' => 'Solde insuffisant ! Solde actuel : ' . number_format($soldeActuel, 2) . ' DT']);
+            }
+        }
 
         $justifPath = null;
         if ($request->hasFile('justificatif')) {
@@ -242,5 +271,27 @@ class CampaignController extends Controller
         );
 
         return back()->with('success', 'Merci pour votre note !');
+    }
+
+    // ══════════════════════════════════════════════════════
+    //  transparence méthode
+    // ══════════════════════════════════════════════════════
+
+    public function transparence(Campaign $campaign)
+    {
+        $dons = $campaign->donations()
+            ->with('user')
+            ->where('status', 'confirme')
+            ->latest()
+            ->get();
+
+        $taches = $campaign->taches()
+            ->with('benevole')
+            ->orderByRaw("FIELD(status, 'validee', 'en_cours', 'ouverte')")
+            ->get();
+
+        $photos = $campaign->photos ?? collect();
+
+        return view('campaigns.transparence', compact('campaign', 'dons', 'taches', 'photos'));
     }
 }

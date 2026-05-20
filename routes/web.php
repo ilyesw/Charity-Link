@@ -20,11 +20,22 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// ══════════════════════════════════════════════════════
+// 2. Dans routes/web.php — ajoute AVANT le groupe auth
+//    (pas besoin de middleware auth — page publique)
+// ══════════════════════════════════════════════════════
+
+Route::get('/campaigns/{campaign}/transparence', [CampaignController::class, 'transparence'])
+    ->name('campaigns.transparence');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar');//zedtou
+    // web.php — dans le groupe auth zedhom mte3 validation ou refus de donation
+    Route::patch('/donations/{donation}/valider', [DonationController::class, 'valider'])->name('donations.valider');
+    Route::patch('/donations/{donation}/refuser', [DonationController::class, 'refuser'])->name('donations.refuser');
 });
 
 // Routes Associations
@@ -141,7 +152,15 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])
         Route::post('/besoins/{besoin}/rejeter', [AdminController::class, 'rejeterBesoin'])
             ->name('besoins.rejeter');
         //Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar');
-    });
+        Route::get('/users', [AdminController::class, 'users'])->name('users');
+        Route::patch('/users/{user}/bloquer', [AdminController::class, 'bloquerUser'])->name('users.bloquer');
+        Route::patch('/users/{user}/debloquer', [AdminController::class, 'debloquerUser'])->name('users.debloquer');
+        Route::delete('/users/{user}/supprimer', [AdminController::class, 'supprimerUser'])->name('users.supprimer');
+        //export fichier pdf excel route
+        
+        Route::get('/dons/export-excel', [AdminController::class, 'exportDonsExcel'])->name('dons.export-excel');
+        Route::get('/dons/export-pdf',   [AdminController::class, 'exportDonsPdf'])->name('dons.export-pdf');
+            });
 
 // Routes Chatbot
 Route::get('/chatbot', [ChatbotController::class, 'index'])
@@ -155,6 +174,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('notifications.index');
     Route::get('/notifications/count', [NotificationController::class, 'count'])
         ->name('notifications.count');
+    Route::delete('/notifications', [NotificationController::class, 'destroyAll'])->name('notifications.destroy-all');
+    Route::get('/notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
 });
 
 // Language switcher

@@ -30,6 +30,10 @@ class TacheController extends Controller
         return view('taches.create', compact('association'));
     }
 
+        // ════════════════════════════════════════════════
+        // 1. TacheController — remplace la méthode store()
+        // ════════════════════════════════════════════════
+
     public function store(Request $request)
     {
         $request->validate([
@@ -37,22 +41,32 @@ class TacheController extends Controller
             'description'        => ['required', 'string'],
             'competence_requise' => ['required', 'string', 'max:255'],
             'deadline'           => ['nullable', 'date', 'after:today'],
+            'campaign_id'        => ['nullable', 'exists:campaigns,id'],  // ← nouveau
         ]);
+
         $association = Association::where('user_id', Auth::id())
             ->where('status', 'validee')
             ->firstOrFail();
+
         Tache::create([
             'association_id'     => $association->id,
             'title'              => $request->title,
             'description'        => $request->description,
             'competence_requise' => $request->competence_requise,
             'deadline'           => $request->deadline,
+            'campaign_id'        => $request->campaign_id,   // ← nouveau
             'status'             => 'ouverte',
         ]);
+
+        // Redirection intelligente : retour à la campagne si créé depuis une campagne
+        if ($request->campaign_id) {
+            return redirect()->route('campaigns.show', $request->campaign_id)
+                ->with('success', 'Mission bénévole créée avec succès !');
+        }
+
         return redirect()->route('taches.index')
             ->with('success', 'Tâche créée avec succès !');
     }
-
     public function postuler(Tache $tache)
     {
         if ($tache->status !== 'ouverte') {

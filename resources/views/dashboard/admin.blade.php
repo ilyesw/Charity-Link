@@ -1,4 +1,4 @@
-{{-- Dashboard Admin --}}
+{{-- Dashboard Admin C:\xampp\htdocs\Charity-Link\resources\views\dashboard\admin.blade.php --}}
 @php
     $stats = [
         'total_users'        => \App\Models\User::count(),
@@ -194,6 +194,10 @@
     <a href="{{ route('taches.mes_taches') }}" class="da-action da-action--outline">
         <i class="bi bi-clipboard2-check-fill"></i>
         <span>Mes tâches</span>
+    </a>
+    <a href="{{ route('admin.users') }}" class="da-action da-action--red">
+        <i class="bi bi-people-fill"></i>
+        <span>Gérer utilisateurs</span>
     </a>
 </div>
 

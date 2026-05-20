@@ -17,42 +17,40 @@ class DonationController extends Controller
 
     public function store(Request $request, Campaign $campaign)
     {
-        $request->validate([
-            'type' => ['required', 'in:financier,nature,competences'],
-        ]);
+        $request->validate(['type' => ['required', 'in:financier,nature,competences']]);
 
         $data = [
-            'user_id'     => Auth::id(),
-            'campaign_id' => $campaign->id,
-            'type'        => $request->type,
-            'message'     => $request->message,
-            'status'      => 'confirme',
+            'user_id'      => Auth::id(),
+            'campaign_id'  => $campaign->id,
+            'type'         => $request->type,
+            'message'      => $request->message,
+            'status'       => 'en_attente',
+            'is_anonymous' => $request->boolean('is_anonymous'),
         ];
 
         if ($request->type === 'financier') {
-            $request->validate([
-                'amount' => ['required', 'numeric', 'min:1'],
-            ]);
+            $request->validate(['amount' => ['required', 'numeric', 'min:1']]);
             $data['amount'] = $request->amount;
             $campaign->increment('current_amount', $request->amount);
         }
 
         if ($request->type === 'nature') {
             $request->validate([
-                'category'       => ['required', 'in:vetements,nourriture,medicaments,scolaire'],
+                'category'       => ['required', 'in:vetements,nourriture,medicaments,scolaire,autre'],
                 'quantity'       => ['required', 'integer', 'min:1'],
                 'pickup_address' => ['required', 'string'],
             ]);
-            $data['category']       = $request->category;
-            $data['quantity']       = $request->quantity;
-            $data['pickup_address'] = $request->pickup_address;
+            $data['category']         = $request->category;
+            $data['quantity']         = $request->quantity;
+            $data['pickup_address']   = $request->pickup_address;
+            $data['item_description'] = $request->item_description;
         }
 
         if ($request->type === 'competences') {
             $request->validate([
                 'competence'      => ['required', 'string', 'max:255'],
                 'availability'    => ['required', 'string', 'max:255'],
-                'competence_desc' => ['required', 'string'],
+                'competence_desc' => ['nullable', 'string'],
             ]);
             $data['competence']      = $request->competence;
             $data['availability']    = $request->availability;
@@ -61,25 +59,22 @@ class DonationController extends Controller
 
         Donation::create($data);
 
-        // Notifier le donateur
-        NotificationHelper::donEffectue(
-            Auth::id(),
-            $campaign->title,
-            $request->type
-        );
+        NotificationHelper::donEffectue(Auth::id(), $campaign->title, $request->type);
 
-        // Notifier l'association
-        $association = $campaign->association;
+        $donorLabel = $data['is_anonymous'] ? 'Donateur anonyme' : Auth::user()->name;
         NotificationHelper::send(
-            $association->user_id,
-            '💰 Nouveau don reçu !',
-            "Vous avez reçu un don ({$request->type}) pour votre campagne \"{$campaign->title}\".",
+            $campaign->association->user_id,
+            '💝 Nouveau don reçu !',
+            "{$donorLabel} a effectué un don ({$request->type}) pour \"{$campaign->title}\".",
             'don',
             '/dashboard'
         );
 
-        return redirect()->route('campaigns.show', $campaign)
-            ->with('success', 'Don effectué avec succès ! Merci pour votre générosité !');
+        $msg = $data['is_anonymous']
+            ? 'Don anonyme enregistré ! Merci pour votre générosité 💝'
+            : 'Don effectué avec succès ! Merci pour votre générosité !';
+
+        return redirect()->route('campaigns.show', $campaign)->with('success', $msg);
     }
 
     public function historique()
@@ -90,5 +85,55 @@ class DonationController extends Controller
             ->paginate(10);
 
         return view('donations.historique', compact('donations'));
+    }
+
+    // ✅ NOUVEAU — Valider un don (association uniquement)
+    public function valider(Donation $donation)
+    {
+        // Vérifier que c'est bien l'association de cette campagne
+        if ($donation->campaign->association->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $donation->update(['status' => 'confirme']);
+
+        // Notifier le donateur
+        $donorLabel = $donation->is_anonymous ? 'Votre don anonyme' : 'Votre don';
+        NotificationHelper::send(
+            $donation->user_id,
+            '✅ Don confirmé !',
+            "{$donorLabel} pour la campagne \"{$donation->campaign->title}\" a été validé par l'association.",
+            'don',
+            '/donations/historique'
+        );
+
+        return redirect()->back()->with('success', 'Don validé avec succès !');
+    }
+
+    // ✅ NOUVEAU — Refuser un don (association uniquement)
+    public function refuser(Donation $donation)
+    {
+        // Vérifier que c'est bien l'association de cette campagne
+        if ($donation->campaign->association->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Si don financier → rembourser le montant à la campagne
+        if ($donation->type === 'financier' && $donation->amount) {
+            $donation->campaign->decrement('current_amount', $donation->amount);
+        }
+
+        $donation->update(['status' => 'annule']);
+
+        // Notifier le donateur
+        NotificationHelper::send(
+            $donation->user_id,
+            '❌ Don refusé',
+            "Votre don pour la campagne \"{$donation->campaign->title}\" n'a pas pu être accepté par l'association.",
+            'don',
+            '/donations/historique'
+        );
+
+        return redirect()->back()->with('success', 'Don refusé.');
     }
 }

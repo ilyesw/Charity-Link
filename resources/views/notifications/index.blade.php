@@ -10,6 +10,13 @@
         </div>
     </x-slot>
 
+    @if(session('success'))
+        <div class="nt-flash">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            {{ session('success') }}
+        </div>
+    @endif
+
     <div class="row justify-content-center">
         <div class="col-lg-7">
 
@@ -22,14 +29,25 @@
                     <p class="ls-empty-desc">Quand vous recevrez des dons, validations ou messages, ils apparaîtront ici.</p>
                 </div>
             @else
-                <div class="ls-count">
-                    <strong>{{ $notifications->total() }}</strong> notification(s)
+                {{-- Header liste --}}
+                <div class="nt-list-header">
+                    <span class="ls-count">
+                        <strong>{{ $notifications->total() }}</strong> notification(s)
+                    </span>
+                    <form method="POST" action="{{ route('notifications.destroy-all') }}"
+                          onsubmit="return confirm('Supprimer toutes les notifications ?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="nt-clear-btn">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                            Tout effacer
+                        </button>
+                    </form>
                 </div>
 
                 <div class="nt-list">
                     @foreach($notifications as $notification)
                         <div class="nt-card {{ !$notification->is_read ? 'nt-card--unread' : '' }}">
-
                             <div class="nt-card-body">
                                 <div class="nt-icon {{ !$notification->is_read ? 'nt-icon--active' : 'nt-icon--muted' }}">
                                     @if($notification->type === 'don')
@@ -53,7 +71,7 @@
                                     <p class="nt-message">{{ $notification->message }}</p>
                                     <div class="nt-foot">
                                         @if($notification->url)
-                                            <a href="{{ $notification->url }}" class="nt-link">
+                                            <a href="{{ route('notifications.read', $notification) }}" class="nt-link">
                                                 Voir
                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                                             </a>
@@ -64,7 +82,6 @@
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     @endforeach
                 </div>
@@ -80,137 +97,51 @@
 </x-app-layout>
 
 <style>
-    .ls-count { font-size: 0.85rem; color: var(--cl-muted); margin-bottom: 1.25rem; }
+    .nt-flash { display: flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1rem; background: var(--cl-green-soft); color: #1A8C38; border: 1px solid rgba(45,198,83,0.15); border-radius: var(--radius-md); font-size: 0.84rem; font-weight: 500; margin-bottom: 1.25rem; }
+
+    .nt-list-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .ls-count { font-size: 0.85rem; color: var(--cl-muted); }
     .ls-count strong { color: var(--cl-dark); font-weight: 700; }
 
-    .ls-empty-card {
-        text-align: center; padding: 3rem 2rem;
-        background: var(--cl-card-bg);
-        border: 1px solid var(--cl-card-border);
-        border-radius: var(--radius-xl);
-        box-shadow: var(--shadow-sm);
-    }
-    .ls-empty-icon {
-        width: 72px; height: 72px;
-        background: var(--cl-light);
-        border-radius: var(--radius-lg);
-        display: flex; align-items: center; justify-content: center;
-        margin: 0 auto 1.25rem;
-    }
+    .nt-clear-btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.9rem; background: var(--cl-red-soft); color: var(--cl-red); border: 1px solid rgba(230,57,70,0.2); border-radius: var(--radius-full); font-family: 'Inter', sans-serif; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+    .nt-clear-btn:hover { background: rgba(230,57,70,0.15); transform: translateY(-1px); }
+
+    .ls-empty-card { text-align: center; padding: 3rem 2rem; background: var(--cl-card-bg); border: 1px solid var(--cl-card-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); }
+    .ls-empty-icon { width: 72px; height: 72px; background: var(--cl-light); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; }
     .ls-empty-title { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1rem; color: var(--cl-dark); margin-bottom: 0.4rem; }
     .ls-empty-desc { font-size: 0.85rem; color: var(--cl-muted); margin-bottom: 0; }
 
-    /* ─── Notification list ─── */
     .nt-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .nt-card { background: var(--cl-card-bg); border: 1px solid var(--cl-card-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-xs); transition: all 0.25s ease; border-left: 3px solid transparent; }
+    .nt-card:hover { box-shadow: var(--shadow-md); }
+    .nt-card--unread { border-left-color: var(--cl-red); }
+    .nt-card-body { display: flex; gap: 0.85rem; padding: 0.9rem 1.15rem; }
 
-    .nt-card {
-        background: var(--cl-card-bg);
-        border: 1px solid var(--cl-card-border);
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-xs);
-        transition: all 0.25s ease;
-        border-left: 3px solid transparent;
-    }
-    .nt-card:hover { box-shadow: var(--shadow-md); border-color: transparent; }
-    .nt-card--unread {
-        border-left-color: var(--cl-red);
-        background: var(--cl-card-bg);
-    }
-    .nt-card--unread:hover { border-left-color: var(--cl-red); }
-    .nt-card-body {
-        display: flex; gap: 0.85rem;
-        padding: 0.9rem 1.15rem;
-    }
-
-    .nt-icon {
-        width: 42px; height: 42px;
-        border-radius: var(--radius-sm);
-        display: flex; align-items: center; justify-content: center;
-        flex-shrink: 0;
-        transition: all 0.25s ease;
-    }
+    .nt-icon { width: 42px; height: 42px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .nt-icon--active { background: var(--cl-red-glow); color: var(--cl-red); }
     .nt-icon--muted { background: var(--cl-light); color: var(--cl-muted); }
 
     .nt-content { flex: 1; min-width: 0; }
-
-    .nt-head {
-        display: flex; align-items: center; gap: 0.5rem;
-        margin-bottom: 0.25rem;
-    }
-    .nt-title {
-        font-family: 'Inter', sans-serif;
-        font-weight: 700; font-size: 0.88rem;
-        color: var(--cl-dark);
-        margin: 0;
-        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
+    .nt-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; }
+    .nt-title { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 0.88rem; color: var(--cl-dark); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .nt-card--unread .nt-title { font-weight: 800; }
-
-    .nt-badge-new {
-        display: inline-flex; align-items: center;
-        padding: 0.2rem 0.55rem;
-        background: var(--cl-red);
-        color: #fff;
-        border-radius: var(--radius-full);
-        font-family: 'Inter', sans-serif;
-        font-size: 0.65rem; font-weight: 700;
-        flex-shrink: 0;
-        letter-spacing: 0.02em;
-    }
-
-    .nt-message {
-        font-size: 0.82rem; color: var(--cl-muted);
-        line-height: 1.55; margin: 0 0 0.5rem;
-    }
+    .nt-badge-new { display: inline-flex; align-items: center; padding: 0.2rem 0.55rem; background: var(--cl-red); color: #fff; border-radius: var(--radius-full); font-family: 'Inter', sans-serif; font-size: 0.65rem; font-weight: 700; flex-shrink: 0; }
+    .nt-message { font-size: 0.82rem; color: var(--cl-muted); line-height: 1.55; margin: 0 0 0.5rem; }
     .nt-card--unread .nt-message { color: var(--cl-body); }
-
-    .nt-foot {
-        display: flex; align-items: center; justify-content: space-between;
-    }
-    .nt-link {
-        display: inline-flex; align-items: center; gap: 0.3rem;
-        font-family: 'Inter', sans-serif;
-        font-size: 0.8rem; font-weight: 600;
-        color: var(--cl-red);
-        text-decoration: none;
-        transition: all 0.2s ease;
-    }
+    .nt-foot { display: flex; align-items: center; justify-content: space-between; }
+    .nt-link { display: inline-flex; align-items: center; gap: 0.3rem; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; color: var(--cl-red); text-decoration: none; transition: all 0.2s ease; }
     .nt-link:hover { gap: 0.5rem; }
-    .nt-link svg { transition: transform 0.2s ease; }
     .nt-link:hover svg { transform: translateX(2px); }
+    .nt-link svg { transition: transform 0.2s ease; }
+    .nt-time { font-size: 0.75rem; color: var(--cl-muted-light); flex-shrink: 0; }
 
-    .nt-time {
-        font-size: 0.75rem; color: var(--cl-muted-light);
-        flex-shrink: 0;
-    }
-
-    /* ─── Pagination ─── */
     .ls-pagination { margin-top: 1.5rem; }
-    .ls-pagination .pagination .page-link {
-        border-radius: var(--radius-sm) !important;
-        margin: 0 2px;
-        border: 1px solid var(--cl-border) !important;
-        color: var(--cl-body) !important;
-        font-weight: 500; font-size: 0.85rem;
-        padding: 0.4rem 0.8rem;
-        background: var(--cl-card-bg) !important;
-        transition: all 0.2s ease;
-    }
-    .ls-pagination .pagination .page-link:hover {
-        background: var(--cl-light) !important;
-        border-color: var(--cl-muted) !important;
-        color: var(--cl-dark) !important;
-    }
-    .ls-pagination .pagination .page-item.active .page-link {
-        background: var(--cl-red) !important;
-        border-color: var(--cl-red) !important;
-        color: #fff !important;
-    }
+    .ls-pagination .pagination .page-link { border-radius: var(--radius-sm) !important; margin: 0 2px; border: 1px solid var(--cl-border) !important; color: var(--cl-body) !important; font-weight: 500; font-size: 0.85rem; padding: 0.4rem 0.8rem; background: var(--cl-card-bg) !important; transition: all 0.2s ease; }
+    .ls-pagination .pagination .page-link:hover { background: var(--cl-light) !important; border-color: var(--cl-muted) !important; color: var(--cl-dark) !important; }
+    .ls-pagination .pagination .page-item.active .page-link { background: var(--cl-red) !important; border-color: var(--cl-red) !important; color: #fff !important; }
 
     @media (max-width: 767.98px) {
         .ls-empty-card { padding: 2rem 1.25rem; border-radius: var(--radius-lg); box-shadow: none; border: none; }
         .nt-card-body { padding: 0.8rem 1rem; }
-        .nt-card--unread { border-left-width: 3px; }
     }
 </style>

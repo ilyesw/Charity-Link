@@ -29,6 +29,8 @@ class Donation extends Model
         'justificatif',
         'is_anonymous',
         'display_name',
+        'is_anonymous',
+        'item_description',
     ];
 
     protected $casts = [

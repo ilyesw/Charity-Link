@@ -28,6 +28,7 @@
                         <small class="dn-campaign-sub">{{ $campaign->association->name }}</small>
                     </div>
                 </div>
+                @if($campaign->goal_amount)
                 <div class="dn-progress-wrap">
                     <div class="dn-progress-bar" style="width: {{ $campaign->progressPercentage() }}%"></div>
                 </div>
@@ -36,6 +37,12 @@
                     <span class="dn-progress-pct">{{ $campaign->progressPercentage() }}%</span>
                     <span class="dn-progress-goal">Objectif : {{ number_format($campaign->goal_amount, 0) }} DT</span>
                 </div>
+                @elseif($campaign->objectif_description)
+                <div class="dn-info-note dn-info-note--blue mt-2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    {{ $campaign->objectif_description }}
+                </div>
+                @endif
             </div>
 
             {{-- Formulaire --}}
@@ -132,10 +139,11 @@
                                 <div class="fm-input-icon-wrap">
                                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--cl-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
                                     <select name="category" class="fm-input fm-input--has-icon fm-select">
-                                        <option value="vetements">Vêtements</option>
-                                        <option value="nourriture">Nourriture</option>
-                                        <option value="medicaments">Médicaments</option>
-                                        <option value="scolaire">Matériel scolaire</option>
+                                        <option value="vetements" {{ old('category') == 'vetements' ? 'selected' : '' }}>Vêtements</option>
+                                        <option value="nourriture" {{ old('category') == 'nourriture' ? 'selected' : '' }}>Nourriture</option>
+                                        <option value="medicaments" {{ old('category') == 'medicaments' ? 'selected' : '' }}>Médicaments</option>
+                                        <option value="scolaire" {{ old('category') == 'scolaire' ? 'selected' : '' }}>Matériel scolaire</option>
+                                        <option value="autre" {{ old('category') == 'autre' ? 'selected' : '' }}>Autre</option>
                                     </select>
                                 </div>
                             </div>
@@ -144,6 +152,12 @@
                                 <input type="number" name="quantity" class="fm-input"
                                     value="{{ old('quantity') }}" min="1" placeholder="Ex: 5">
                             </div>
+                        </div>
+                        <div class="fm-group">
+                            <label class="fm-label">Description de l'article <span class="fm-section-optional">optionnel</span></label>
+                            <input type="text" name="item_description" class="fm-input"
+                                value="{{ old('item_description') }}"
+                                placeholder="Ex: Manteaux adultes taille M/L, livres scolaires primaire...">
                         </div>
                         <div class="fm-group">
                             <label class="fm-label">Lieu de dépôt</label>
@@ -197,6 +211,42 @@
                         </div>
                     </div>
 
+                    {{-- ═══ ANONYMAT ═══ --}}
+                    <div class="dn-anon-box">
+                        <label class="dn-anon-label" for="is_anonymous">
+                            <div class="dn-anon-left">
+                                <div class="dn-anon-icon">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                        <line x1="2" y1="2" x2="22" y2="22"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="dn-anon-title">Don anonyme</div>
+                                    <div class="dn-anon-sub">Votre nom n'apparaîtra pas publiquement</div>
+                                </div>
+                            </div>
+                            {{-- Toggle switch --}}
+                            <div class="dn-toggle-wrap">
+                                <input type="checkbox" name="is_anonymous" id="is_anonymous"
+                                    class="dn-toggle-input"
+                                    value="1"
+                                    {{ old('is_anonymous') ? 'checked' : '' }}
+                                    onchange="updateAnonPreview(this.checked)">
+                                <span class="dn-toggle-track">
+                                    <span class="dn-toggle-thumb"></span>
+                                </span>
+                            </div>
+                        </label>
+
+                        {{-- Preview --}}
+                        <div id="anon-preview" class="dn-anon-preview d-none">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            Votre don sera affiché comme : <strong>Donateur anonyme</strong>
+                        </div>
+                    </div>
+
                     {{-- Actions --}}
                     <div class="fm-actions">
                         <a href="{{ route('campaigns.show', $campaign) }}" class="fm-btn fm-btn--ghost">
@@ -227,8 +277,24 @@
             event.target.classList.add('dn-chip--active');
         }
 
+        function updateAnonPreview(checked) {
+            const preview = document.getElementById('anon-preview');
+            const box = document.querySelector('.dn-anon-box');
+            if (checked) {
+                preview.classList.remove('d-none');
+                box.classList.add('dn-anon-box--active');
+            } else {
+                preview.classList.add('d-none');
+                box.classList.remove('dn-anon-box--active');
+            }
+        }
+
         @if(old('type'))
             showSection('{{ old('type') }}');
+        @endif
+
+        @if(old('is_anonymous'))
+            updateAnonPreview(true);
         @endif
     </script>
 
@@ -360,7 +426,7 @@
         }
         .fm-select {
             cursor: pointer;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='<http://www.w3.org/2000/svg>' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 14px center;
             padding-right: 2.5rem;
@@ -445,6 +511,7 @@
         }
         .dn-info-note svg { flex-shrink: 0; }
         .dn-info-note--green { background: var(--cl-green-soft); color: #1A8C38; border: 1px solid rgba(45,198,83,0.15); }
+        .dn-info-note--blue { background: rgba(29,53,87,0.06); color: var(--cl-blue); border: 1px solid rgba(29,53,87,0.12); margin-bottom: 0; }
 
         /* ─── Amount chips ─── */
         .dn-amount-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; }
@@ -465,6 +532,76 @@
             border-color: var(--cl-red) !important;
         }
 
+        /* ─── Anonymat ─── */
+        .dn-anon-box {
+            margin-bottom: 1.75rem;
+            padding: 1rem 1.15rem;
+            border: 1.5px solid var(--cl-border);
+            border-radius: var(--radius-lg);
+            background: var(--cl-card-bg);
+            transition: all 0.25s ease;
+        }
+        .dn-anon-box--active {
+            border-color: rgba(107,114,128,0.5);
+            background: var(--cl-light);
+        }
+        .dn-anon-label {
+            display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer; margin: 0;
+            gap: 1rem;
+        }
+        .dn-anon-left { display: flex; align-items: center; gap: 0.85rem; }
+        .dn-anon-icon {
+            width: 38px; height: 38px; flex-shrink: 0;
+            background: var(--cl-light);
+            border: 1px solid var(--cl-border);
+            border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--cl-muted);
+            transition: all 0.25s ease;
+        }
+        .dn-anon-box--active .dn-anon-icon {
+            background: rgba(107,114,128,0.12);
+            border-color: rgba(107,114,128,0.3);
+            color: var(--cl-body);
+        }
+        .dn-anon-title { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 0.88rem; color: var(--cl-dark); }
+        .dn-anon-sub { font-size: 0.78rem; color: var(--cl-muted); margin-top: 0.1rem; }
+
+        /* Toggle switch */
+        .dn-toggle-wrap { position: relative; flex-shrink: 0; }
+        .dn-toggle-input { position: absolute; opacity: 0; width: 0; height: 0; }
+        .dn-toggle-track {
+            display: block; width: 44px; height: 24px;
+            background: var(--cl-border);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: background 0.25s ease;
+            position: relative;
+        }
+        .dn-toggle-thumb {
+            display: block; width: 18px; height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute; top: 3px; left: 3px;
+            transition: transform 0.25s ease;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+        }
+        .dn-toggle-input:checked + .dn-toggle-track { background: #6b7280; }
+        .dn-toggle-input:checked + .dn-toggle-track .dn-toggle-thumb { transform: translateX(20px); }
+        html.dark .dn-toggle-track { background: rgba(255,255,255,0.15); }
+        html.dark .dn-toggle-input:checked + .dn-toggle-track { background: #9ca3af; }
+
+        /* Anon preview */
+        .dn-anon-preview {
+            display: flex; align-items: center; gap: 0.4rem;
+            margin-top: 0.85rem; padding-top: 0.75rem;
+            border-top: 1px dashed var(--cl-border);
+            font-size: 0.79rem; color: var(--cl-muted);
+            animation: dn-fadeIn 0.2s ease;
+        }
+        .dn-anon-preview strong { color: var(--cl-body); }
+
         @media (max-width: 767.98px) {
             .fm-card { padding: 1.25rem 1.1rem; border-radius: var(--radius-lg); box-shadow: none; border: none; }
             .dn-campaign-card { border-radius: var(--radius-lg); box-shadow: none; border: none; }
@@ -473,6 +610,7 @@
             .fm-actions { flex-direction: column-reverse; gap: 0.6rem; }
             .fm-btn { justify-content: center; width: 100%; }
             .dn-section { padding: 1rem; border-radius: var(--radius-md); }
+            .dn-anon-box { padding: 0.9rem 1rem; }
         }
     </style>
 </x-app-layout>

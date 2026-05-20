@@ -19,6 +19,7 @@ class User extends Authenticatable
         'avatar',
         'language',
         'is_active',
+        'is_blocked',
     ];
 
     protected $hidden = [
