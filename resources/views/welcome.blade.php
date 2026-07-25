@@ -1,6 +1,6 @@
 {{--resources\views\welcome.blade.php  --}}
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -83,7 +83,6 @@
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--cl-white);
@@ -94,13 +93,7 @@
             overflow-x: hidden;
             transition: background-color 0.35s ease, color 0.35s ease;
         }
-
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Playfair Display', Georgia, serif;
-            color: var(--cl-dark);
-            transition: color 0.35s ease;
-        }
-
+        h1, h2, h3, h4, h5, h6 { font-family: 'Playfair Display', Georgia, serif; color: var(--cl-dark); transition: color 0.35s ease; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
@@ -109,701 +102,155 @@
         html.dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }
         img { max-width: 100%; }
 
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(24px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-        @keyframes pulse-ring {
-            0% { transform: scale(0.9); opacity: 1; }
-            100% { transform: scale(1.6); opacity: 0; }
-        }
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-        @keyframes count-up {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        @keyframes pulse-ring { 0% { transform: scale(0.9); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        @keyframes count-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .anim-fade-up { animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
         .anim-fade-up-d1 { animation: fadeUp 0.7s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both; }
         .anim-fade-up-d2 { animation: fadeUp 0.7s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both; }
         .anim-fade-up-d3 { animation: fadeUp 0.7s 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
         .anim-fade-up-d4 { animation: fadeUp 0.7s 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
-        .dark-toggle {
-            width: 40px; height: 40px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--cl-border);
-            background: var(--cl-card-bg);
-            color: var(--cl-body);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.05rem;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            flex-shrink: 0;
-        }
-        .dark-toggle:hover {
-            border-color: var(--cl-red);
-            color: var(--cl-red);
-            background: var(--cl-red-glow);
-            transform: rotate(15deg);
-        }
+        .dark-toggle { width: 40px; height: 40px; border-radius: var(--radius-sm); border: 1px solid var(--cl-border); background: var(--cl-card-bg); color: var(--cl-body); display: flex; align-items: center; justify-content: center; font-size: 1.05rem; cursor: pointer; transition: all 0.25s ease; flex-shrink: 0; }
+        .dark-toggle:hover { border-color: var(--cl-red); color: var(--cl-red); background: var(--cl-red-glow); transform: rotate(15deg); }
         .dark-toggle .icon-sun { display: none; }
         .dark-toggle .icon-moon { display: block; }
         html.dark .dark-toggle .icon-sun { display: block; }
         html.dark .dark-toggle .icon-moon { display: none; }
 
-        /* ══════════════ LANGUAGE SWITCHER ══════════════ */
-        .lang-switcher {
-            display: flex;
-            align-items: center;
-            gap: 0.2rem;
-            background: var(--cl-light);
-            border: 1px solid var(--cl-border);
-            border-radius: var(--radius-sm);
-            padding: 0.2rem;
-            transition: all 0.35s ease;
-        }
-        .lang-btn {
-            padding: 0.25rem 0.45rem;
-            border-radius: 5px;
-            font-size: 1rem;
-            text-decoration: none;
-            line-height: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s ease;
-        }
+        .lang-switcher { display: flex; align-items: center; gap: 0.2rem; background: var(--cl-light); border: 1px solid var(--cl-border); border-radius: var(--radius-sm); padding: 0.2rem; transition: all 0.35s ease; }
+        .lang-btn { padding: 0.25rem 0.45rem; border-radius: 5px; font-size: 1rem; text-decoration: none; line-height: 1; display: flex; align-items: center; justify-content: center; transition: background 0.2s ease; }
         .lang-btn:hover { background: var(--cl-card-bg); }
-        .lang-btn--active {
-            background: var(--cl-card-bg);
-            box-shadow: var(--shadow-xs);
-        }
+        .lang-btn--active { background: var(--cl-card-bg); box-shadow: var(--shadow-xs); }
 
-        .navbar-main {
-            background: var(--cl-nav-bg);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-bottom: 1px solid var(--cl-nav-border);
-            padding: 0.75rem 0;
-            transition: all 0.35s ease;
-            z-index: 1050;
-        }
-        .navbar-main.scrolled {
-            background: var(--cl-nav-scrolled);
-            box-shadow: var(--cl-nav-shadow);
-        }
-        .navbar-main .nav-link {
-            font-weight: 500;
-            color: var(--cl-body);
-            padding: 0.5rem 0.85rem !important;
-            font-size: 0.875rem;
-            border-radius: var(--radius-sm);
-            transition: all 0.2s ease;
-        }
-        .navbar-main .nav-link:hover {
-            color: var(--cl-red);
-            background: var(--cl-red-glow);
-        }
-        .navbar-main .nav-link .nav-icon-ai {
-            font-size: 0.95rem;
-            margin-right: 0.15rem;
-            transition: transform 0.3s ease;
-        }
-        .navbar-main .nav-link:hover .nav-icon-ai {
-            transform: rotate(15deg) scale(1.1);
-        }
+        .navbar-main { background: var(--cl-nav-bg); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--cl-nav-border); padding: 0.75rem 0; transition: all 0.35s ease; z-index: 1050; }
+        .navbar-main.scrolled { background: var(--cl-nav-scrolled); box-shadow: var(--cl-nav-shadow); }
+        .navbar-main .nav-link { font-weight: 500; color: var(--cl-body); padding: 0.5rem 0.85rem !important; font-size: 0.875rem; border-radius: var(--radius-sm); transition: all 0.2s ease; }
+        .navbar-main .nav-link:hover { color: var(--cl-red); background: var(--cl-red-glow); }
+        .navbar-main .nav-link .nav-icon-ai { font-size: 0.95rem; margin-right: 0.15rem; transition: transform 0.3s ease; }
+        .navbar-main .nav-link:hover .nav-icon-ai { transform: rotate(15deg) scale(1.1); }
 
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            text-decoration: none;
-        }
-        .nav-logo-icon {
-            width: 40px; height: 40px;
-            background: var(--cl-red);
-            border-radius: var(--radius-sm);
-            display: flex; align-items: center; justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .nav-logo-icon::after {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%);
-            animation: shimmer 3s ease-in-out infinite;
-            background-size: 200% 100%;
-        }
+        .nav-brand { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+        .nav-logo-icon { width: 40px; height: 40px; background: var(--cl-red); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+        .nav-logo-icon::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%); animation: shimmer 3s ease-in-out infinite; background-size: 200% 100%; }
         .nav-logo-icon i { color: #fff; font-size: 1.1rem; position: relative; z-index: 1; }
-        .nav-brand-name {
-            font-family: 'Inter', sans-serif;
-            font-weight: 800;
-            font-size: 1.2rem;
-            color: var(--cl-dark);
-            letter-spacing: -0.03em;
-            transition: color 0.35s ease;
-        }
+        .nav-brand-name { font-family: 'Inter', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--cl-dark); letter-spacing: -0.03em; transition: color 0.35s ease; }
         .nav-brand-name span { color: var(--cl-red); }
 
-        .nav-btn-donate {
-            background: var(--cl-red);
-            color: #fff;
-            border: none;
-            border-radius: var(--radius-full);
-            padding: 0.55rem 1.35rem;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: all 0.25s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-        .nav-btn-donate:hover {
-            background: var(--cl-red-hover);
-            color: #fff;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 14px rgba(230,57,70,0.35);
-        }
-        .nav-btn-ghost {
-            background: none;
-            border: none;
-            color: var(--cl-muted);
-            font-weight: 500;
-            font-size: 0.875rem;
-            padding: 0.55rem 0.75rem;
-            border-radius: var(--radius-sm);
-            transition: all 0.2s ease;
-            text-decoration: none;
-        }
+        .nav-btn-donate { background: var(--cl-red); color: #fff; border: none; border-radius: var(--radius-full); padding: 0.55rem 1.35rem; font-weight: 600; font-size: 0.85rem; transition: all 0.25s ease; display: inline-flex; align-items: center; gap: 0.4rem; }
+        .nav-btn-donate:hover { background: var(--cl-red-hover); color: #fff; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(230,57,70,0.35); }
+        .nav-btn-ghost { background: none; border: none; color: var(--cl-muted); font-weight: 500; font-size: 0.875rem; padding: 0.55rem 0.75rem; border-radius: var(--radius-sm); transition: all 0.2s ease; text-decoration: none; }
         .nav-btn-ghost:hover { color: var(--cl-dark); background: var(--cl-red-glow); }
 
-        .navbar-toggler {
-            border: 1px solid var(--cl-border);
-            border-radius: var(--radius-sm);
-            padding: 0.4rem 0.6rem;
-            transition: all 0.2s ease;
-        }
+        .navbar-toggler { border: 1px solid var(--cl-border); border-radius: var(--radius-sm); padding: 0.4rem 0.6rem; transition: all 0.2s ease; }
         .navbar-toggler:hover { border-color: var(--cl-red); }
         .navbar-toggler:focus { box-shadow: none; border-color: var(--cl-red); }
 
-        .hero {
-            background: var(--cl-white);
-            position: relative;
-            overflow: visible;
-            transition: background-color 0.35s ease;
-        }
-        .hero-bg-pattern {
-            position: absolute;
-            inset: 0;
-            opacity: 0.4;
-            background-image:
-                radial-gradient(circle at 15% 20%, rgba(230,57,70,0.06) 0%, transparent 50%),
-                radial-gradient(circle at 85% 80%, rgba(29,53,87,0.05) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(45,198,83,0.03) 0%, transparent 40%);
-            pointer-events: none;
-        }
+        .hero { background: var(--cl-white); position: relative; overflow: visible; transition: background-color 0.35s ease; }
+        .hero-bg-pattern { position: absolute; inset: 0; opacity: 0.4; background-image: radial-gradient(circle at 15% 20%, rgba(230,57,70,0.06) 0%, transparent 50%), radial-gradient(circle at 85% 80%, rgba(29,53,87,0.05) 0%, transparent 50%), radial-gradient(circle at 50% 50%, rgba(45,198,83,0.03) 0%, transparent 40%); pointer-events: none; }
         html.dark .hero-bg-pattern { opacity: 0.25; }
-        .hero-grid-pattern {
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(var(--cl-hero-pattern) 1px, transparent 1px),
-                linear-gradient(90deg, var(--cl-hero-pattern) 1px, transparent 1px);
-            background-size: 60px 60px;
-            pointer-events: none;
-        }
-
+        .hero-grid-pattern { position: absolute; inset: 0; background-image: linear-gradient(var(--cl-hero-pattern) 1px, transparent 1px), linear-gradient(90deg, var(--cl-hero-pattern) 1px, transparent 1px); background-size: 60px 60px; pointer-events: none; }
         .hero-content { position: relative; z-index: 2; }
 
-        .hero-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: var(--cl-red-soft);
-            border: 1px solid rgba(230,57,70,0.15);
-            border-radius: var(--radius-full);
-            padding: 0.4rem 1rem;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--cl-red);
-            transition: all 0.35s ease;
-        }
-        .hero-tag .pulse-dot {
-            width: 6px; height: 6px;
-            background: var(--cl-green);
-            border-radius: 50%;
-            position: relative;
-        }
-        .hero-tag .pulse-dot::after {
-            content: '';
-            position: absolute;
-            inset: -3px;
-            border-radius: 50%;
-            border: 1.5px solid var(--cl-green);
-            animation: pulse-ring 2s ease-out infinite;
-        }
+        .hero-tag { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--cl-red-soft); border: 1px solid rgba(230,57,70,0.15); border-radius: var(--radius-full); padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: 600; color: var(--cl-red); transition: all 0.35s ease; }
+        .hero-tag .pulse-dot { width: 6px; height: 6px; background: var(--cl-green); border-radius: 50%; position: relative; }
+        .hero-tag .pulse-dot::after { content: ''; position: absolute; inset: -3px; border-radius: 50%; border: 1.5px solid var(--cl-green); animation: pulse-ring 2s ease-out infinite; }
 
-        .hero-title {
-            font-size: clamp(2.4rem, 5.5vw, 3.8rem);
-            font-weight: 900;
-            line-height: 1.05;
-            letter-spacing: -0.03em;
-            color: var(--cl-dark);
-            margin: 1.5rem 0;
-        }
-        .hero-title .accent {
-            position: relative;
-            color: var(--cl-red);
-            display: inline-block;
-        }
-        .hero-title .accent::after {
-            content: '';
-            position: absolute;
-            bottom: 2px; left: -4px; right: -4px;
-            height: 8px;
-            background: var(--cl-red-glow);
-            border-radius: 4px;
-            z-index: -1;
-        }
-
-        .hero-desc {
-            font-size: 1.1rem;
-            color: var(--cl-muted);
-            line-height: 1.75;
-            max-width: 500px;
-            transition: color 0.35s ease;
-        }
+        .hero-title { font-size: clamp(2.4rem, 5.5vw, 3.8rem); font-weight: 900; line-height: 1.05; letter-spacing: -0.03em; color: var(--cl-dark); margin: 1.5rem 0; }
+        .hero-title .accent { position: relative; color: var(--cl-red); display: inline-block; }
+        .hero-title .accent::after { content: ''; position: absolute; bottom: 2px; left: -4px; right: -4px; height: 8px; background: var(--cl-red-glow); border-radius: 4px; z-index: -1; }
+        .hero-desc { font-size: 1.1rem; color: var(--cl-muted); line-height: 1.75; max-width: 500px; transition: color 0.35s ease; }
 
         .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 2rem; }
-        .btn-hero-primary {
-            background: var(--cl-red);
-            color: #fff;
-            border: none;
-            border-radius: var(--radius-full);
-            padding: 0.85rem 2rem;
-            font-weight: 700;
-            font-size: 0.95rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        .btn-hero-primary::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .btn-hero-primary:hover {
-            background: var(--cl-red-hover);
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(230,57,70,0.35);
-        }
+        .btn-hero-primary { background: var(--cl-red); color: #fff; border: none; border-radius: var(--radius-full); padding: 0.85rem 2rem; font-weight: 700; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1); position: relative; overflow: hidden; }
+        .btn-hero-primary::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent); opacity: 0; transition: opacity 0.3s ease; }
+        .btn-hero-primary:hover { background: var(--cl-red-hover); color: #fff; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(230,57,70,0.35); }
         .btn-hero-primary:hover::before { opacity: 1; }
+        .btn-hero-secondary { background: var(--cl-card-bg); color: var(--cl-dark); border: 1.5px solid var(--cl-border); border-radius: var(--radius-full); padding: 0.8rem 1.75rem; font-weight: 600; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.25s ease; }
+        .btn-hero-secondary:hover { border-color: var(--cl-red); color: var(--cl-red); transform: translateY(-2px); box-shadow: var(--shadow-lg); }
 
-        .btn-hero-secondary {
-            background: var(--cl-card-bg);
-            color: var(--cl-dark);
-            border: 1.5px solid var(--cl-border);
-            border-radius: var(--radius-full);
-            padding: 0.8rem 1.75rem;
-            font-weight: 600;
-            font-size: 0.95rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.25s ease;
-        }
-        .btn-hero-secondary:hover {
-            border-color: var(--cl-red);
-            color: var(--cl-red);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .hero-stats {
-            display: flex;
-            gap: 0;
-            margin-top: 2.5rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--cl-border);
-            transition: border-color 0.35s ease;
-        }
-        .hero-stat {
-            flex: 1;
-            padding-right: 1.5rem;
-            position: relative;
-        }
-        .hero-stat:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            right: 0; top: 4px; bottom: 4px;
-            width: 1px;
-            background: var(--cl-border);
-            transition: background 0.35s ease;
-        }
-        .hero-stat-value {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--cl-dark);
-            line-height: 1.1;
-            animation: count-up 0.6s ease both;
-            transition: color 0.35s ease;
-        }
-        .hero-stat-label {
-            font-size: 0.78rem;
-            font-weight: 500;
-            color: var(--cl-muted);
-            margin-top: 0.2rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            transition: color 0.35s ease;
-        }
+        .hero-stats { display: flex; gap: 0; margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid var(--cl-border); transition: border-color 0.35s ease; }
+        .hero-stat { flex: 1; padding-right: 1.5rem; position: relative; }
+        .hero-stat:not(:last-child)::after { content: ''; position: absolute; right: 0; top: 4px; bottom: 4px; width: 1px; background: var(--cl-border); transition: background 0.35s ease; }
+        .hero-stat-value { font-family: 'Playfair Display', serif; font-size: 1.75rem; font-weight: 700; color: var(--cl-dark); line-height: 1.1; animation: count-up 0.6s ease both; transition: color 0.35s ease; }
+        .hero-stat-label { font-size: 0.78rem; font-weight: 500; color: var(--cl-muted); margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.05em; transition: color 0.35s ease; }
 
         .hero-cards-col { position: relative; z-index: 2; }
-
-        .hero-card {
-            background: var(--cl-card-bg);
-            border: 1px solid var(--cl-card-border);
-            border-radius: var(--radius-lg);
-            padding: 1.25rem;
-            margin-bottom: 0.875rem;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.35s ease, border-color 0.35s ease;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-        .hero-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--cl-red), var(--cl-red-hover));
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .hero-card:hover {
-            transform: translateY(-4px) scale(1.01);
-            box-shadow: var(--shadow-xl);
-            border-color: transparent;
-        }
+        .hero-card { background: var(--cl-card-bg); border: 1px solid var(--cl-card-border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 0.875rem; box-shadow: var(--shadow-sm); transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.35s ease, border-color 0.35s ease; cursor: pointer; position: relative; overflow: hidden; }
+        .hero-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cl-red), var(--cl-red-hover)); transform: scaleX(0); transform-origin: left; transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+        .hero-card:hover { transform: translateY(-4px) scale(1.01); box-shadow: var(--shadow-xl); border-color: transparent; }
         .hero-card:hover::before { transform: scaleX(1); }
         .hero-card:last-child { margin-bottom: 0; }
-
-        .hero-card-badge {
-            display: inline-block;
-            background: var(--cl-red-soft);
-            color: var(--cl-red);
-            font-size: 0.68rem;
-            font-weight: 700;
-            padding: 0.25rem 0.6rem;
-            border-radius: var(--radius-full);
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-bottom: 0.6rem;
-            transition: all 0.35s ease;
-        }
-        .hero-card-title {
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            font-size: 0.92rem;
-            color: var(--cl-dark);
-            margin-bottom: 0.25rem;
-            line-height: 1.35;
-            transition: color 0.35s ease;
-        }
-        .hero-card-meta {
-            font-size: 0.78rem;
-            color: var(--cl-muted);
-            margin-bottom: 0.75rem;
-            transition: color 0.35s ease;
-        }
+        .hero-card-badge { display: inline-block; background: var(--cl-red-soft); color: var(--cl-red); font-size: 0.68rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: var(--radius-full); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.6rem; transition: all 0.35s ease; }
+        .hero-card-title { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 0.92rem; color: var(--cl-dark); margin-bottom: 0.25rem; line-height: 1.35; transition: color 0.35s ease; }
+        .hero-card-meta { font-size: 0.78rem; color: var(--cl-muted); margin-bottom: 0.75rem; transition: color 0.35s ease; }
         .hero-card-meta i { color: var(--cl-green); margin-right: 0.2rem; }
+        .progress-bar-cl { height: 5px; background: var(--cl-light); border-radius: var(--radius-full); overflow: hidden; transition: background 0.35s ease; }
+        .progress-bar-cl .bar { height: 100%; background: linear-gradient(90deg, var(--cl-red), #f87171); border-radius: var(--radius-full); transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1); position: relative; }
+        .progress-bar-cl .bar::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 20px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4)); border-radius: 0 var(--radius-full) var(--radius-full) 0; }
+        .hero-card-stats { display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; }
+        .hero-card-amount { font-weight: 700; font-size: 0.88rem; color: var(--cl-dark); transition: color 0.35s ease; }
+        .hero-card-percent { font-weight: 700; font-size: 0.8rem; color: var(--cl-red); background: var(--cl-red-soft); padding: 0.15rem 0.5rem; border-radius: var(--radius-full); transition: all 0.35s ease; }
 
-        .progress-bar-cl {
-            height: 5px;
-            background: var(--cl-light);
-            border-radius: var(--radius-full);
-            overflow: hidden;
-            transition: background 0.35s ease;
-        }
-        .progress-bar-cl .bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--cl-red), #f87171);
-            border-radius: var(--radius-full);
-            transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
-            position: relative;
-        }
-        .progress-bar-cl .bar::after {
-            content: '';
-            position: absolute;
-            right: 0; top: 0; bottom: 0;
-            width: 20px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4));
-            border-radius: 0 var(--radius-full) var(--radius-full) 0;
-        }
+        /* Badge type campagne */
+        .hero-card-type-badge { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: var(--radius-full); border: 1px solid transparent; }
+        .hero-card-type-badge--nature { background: rgba(29,53,87,0.10); color: #1D3557; border-color: rgba(29,53,87,0.15); }
+        .hero-card-type-badge--benevole { background: var(--cl-green-soft); color: #1a8c38; border-color: rgba(45,198,83,0.15); }
+        html.dark .hero-card-type-badge--nature { background: rgba(147,187,253,0.18) !important; color: #bdd3fe !important; border-color: rgba(147,187,253,0.4) !important; }
+        html.dark .hero-card-type-badge--benevole { background: rgba(45,198,83,0.18) !important; color: #4ade80 !important; border-color: rgba(45,198,83,0.4) !important; }
+        .cc-type-badge { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; font-weight: 600; padding: 0.22rem 0.65rem; border-radius: var(--radius-full); border: 1px solid transparent; }
+        .cc-type-badge--nature { background: rgba(29,53,87,0.10); color: #1D3557; border-color: rgba(29,53,87,0.15); }
+        .cc-type-badge--benevole { background: var(--cl-green-soft); color: #1a8c38; border-color: rgba(45,198,83,0.15); }
+        html.dark .cc-type-badge--nature { background: rgba(147,187,253,0.18) !important; color: #bdd3fe !important; border-color: rgba(147,187,253,0.4) !important; }
+        html.dark .cc-type-badge--benevole { background: rgba(45,198,83,0.18) !important; color: #4ade80 !important; border-color: rgba(45,198,83,0.4) !important; }
+        .cc-active-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: currentColor; margin-right: 0.15rem; }
 
-        .hero-card-stats {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 0.5rem;
-        }
-        .hero-card-amount {
-            font-weight: 700;
-            font-size: 0.88rem;
-            color: var(--cl-dark);
-            transition: color 0.35s ease;
-        }
-        .hero-card-percent {
-            font-weight: 700;
-            font-size: 0.8rem;
-            color: var(--cl-red);
-            background: var(--cl-red-soft);
-            padding: 0.15rem 0.5rem;
-            border-radius: var(--radius-full);
-            transition: all 0.35s ease;
-        }
-
-        .hero-empty-state {
-            background: var(--cl-light);
-            border: 2px dashed var(--cl-border);
-            border-radius: var(--radius-lg);
-            padding: 3rem 2rem;
-            text-align: center;
-            transition: all 0.35s ease;
-        }
-        .hero-empty-state .icon-wrap {
-            width: 64px; height: 64px;
-            background: var(--cl-red-soft);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 1rem;
-        }
+        .hero-empty-state { background: var(--cl-light); border: 2px dashed var(--cl-border); border-radius: var(--radius-lg); padding: 3rem 2rem; text-align: center; transition: all 0.35s ease; }
+        .hero-empty-state .icon-wrap { width: 64px; height: 64px; background: var(--cl-red-soft); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
         .hero-empty-state .icon-wrap i { font-size: 1.5rem; color: var(--cl-red); }
         .hero-empty-state p { color: var(--cl-muted); font-size: 0.92rem; margin: 0; }
 
-        .hero-float-badge {
-            position: absolute;
-            background: var(--cl-card-bg);
-            border: 1px solid var(--cl-card-border);
-            border-radius: var(--radius-md);
-            padding: 0.6rem 1rem;
-            box-shadow: var(--shadow-md);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.82rem;
-            font-weight: 600;
-            color: var(--cl-dark);
-            z-index: 5;
-            white-space: nowrap;
-            transition: all 0.35s ease;
-        }
-        .hero-float-badge .fb-icon {
-            width: 28px; height: 28px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.85rem;
-            flex-shrink: 0;
-        }
+        .hero-float-badge { position: absolute; background: var(--cl-card-bg); border: 1px solid var(--cl-card-border); border-radius: var(--radius-md); padding: 0.6rem 1rem; box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; font-weight: 600; color: var(--cl-dark); z-index: 5; white-space: nowrap; transition: all 0.35s ease; }
+        .hero-float-badge .fb-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; }
         .fb-icon-green { background: var(--cl-green-soft); }
         .fb-icon-blue { background: var(--cl-blue-soft); }
-        html.dark .fb-icon-blue i,
-        html.dark .cc-badge { color: #93bbfd !important; }
-        .hero-float-badge.badge-ai {
-            top: -16px; right: -8px;
-            animation: float 5s ease-in-out infinite;
-            animation-delay: 0.5s;
-        }
-        .hero-float-badge.badge-trust {
-            bottom: -16px; right: -8px;
-            animation: float 5s ease-in-out infinite;
-            animation-delay: 1.2s;
-        }
+        html.dark .fb-icon-blue i, html.dark .cc-badge { color: #93bbfd !important; }
+        .hero-float-badge.badge-ai { top: -16px; right: -8px; animation: float 5s ease-in-out infinite; animation-delay: 0.5s; }
+        .hero-float-badge.badge-trust { bottom: -16px; right: -8px; animation: float 5s ease-in-out infinite; animation-delay: 1.2s; }
 
-        .trust-strip {
-            background: var(--cl-light);
-            border-top: 1px solid var(--cl-border);
-            border-bottom: 1px solid var(--cl-border);
-            padding: 1.25rem 0;
-            transition: all 0.35s ease;
-        }
-        .trust-item {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            font-size: 0.82rem;
-            font-weight: 500;
-            color: var(--cl-muted);
-            transition: color 0.35s ease;
-        }
+        .trust-strip { background: var(--cl-light); border-top: 1px solid var(--cl-border); border-bottom: 1px solid var(--cl-border); padding: 1.25rem 0; transition: all 0.35s ease; }
+        .trust-item { display: flex; align-items: center; gap: 0.6rem; font-size: 0.82rem; font-weight: 500; color: var(--cl-muted); transition: color 0.35s ease; }
         .trust-item i { font-size: 1rem; color: var(--cl-green); }
 
-        .section-eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--cl-red);
-            margin-bottom: 0.75rem;
-        }
+        .section-eyebrow { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--cl-red); margin-bottom: 0.75rem; }
         .section-eyebrow i { font-size: 0.7rem; }
-        .section-heading {
-            font-size: clamp(1.75rem, 4vw, 2.5rem);
-            font-weight: 700;
-            line-height: 1.15;
-            letter-spacing: -0.02em;
-            margin-bottom: 0.6rem;
-        }
-        .section-desc {
-            font-size: 1rem;
-            color: var(--cl-muted);
-            line-height: 1.7;
-            max-width: 520px;
-            transition: color 0.35s ease;
-        }
+        .section-heading { font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 0.6rem; }
+        .section-desc { font-size: 1rem; color: var(--cl-muted); line-height: 1.7; max-width: 520px; transition: color 0.35s ease; }
 
-        .how-section {
-            background: var(--cl-white);
-            position: relative;
-            transition: background-color 0.35s ease;
-        }
-        .how-section::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 1px;
-            background: var(--cl-border);
-            transition: background 0.35s ease;
-        }
-        .step-card {
-            background: var(--cl-card-bg);
-            border: 1px solid var(--cl-card-border);
-            border-radius: var(--radius-xl);
-            padding: 2rem 1.75rem;
-            height: 100%;
-            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.35s ease, border-color 0.35s ease;
-            position: relative;
-        }
-        .step-card:hover {
-            border-color: transparent;
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-xl);
-        }
-        .step-card-icon {
-            width: 56px; height: 56px;
-            border-radius: var(--radius-lg);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.4rem;
-            margin-bottom: 1.5rem;
-            transition: transform 0.3s ease, background 0.35s ease;
-        }
+        .how-section { background: var(--cl-white); position: relative; transition: background-color 0.35s ease; }
+        .how-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: var(--cl-border); transition: background 0.35s ease; }
+        .step-card { background: var(--cl-card-bg); border: 1px solid var(--cl-card-border); border-radius: var(--radius-xl); padding: 2rem 1.75rem; height: 100%; transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.35s ease, border-color 0.35s ease; position: relative; }
+        .step-card:hover { border-color: transparent; transform: translateY(-8px); box-shadow: var(--shadow-xl); }
+        .step-card-icon { width: 56px; height: 56px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 1.5rem; transition: transform 0.3s ease, background 0.35s ease; }
         .step-card:hover .step-card-icon { transform: scale(1.1) rotate(-3deg); }
         .step-icon-red { background: var(--cl-red-soft); }
         .step-icon-green { background: var(--cl-green-soft); }
         .step-icon-blue { background: var(--cl-blue-soft); }
-        .step-num {
-            font-family: 'Playfair Display', serif;
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: var(--cl-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            margin-bottom: 0.5rem;
-            transition: color 0.35s ease;
-        }
+        .step-num { font-family: 'Playfair Display', serif; font-size: 0.7rem; font-weight: 700; color: var(--cl-muted); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 0.5rem; transition: color 0.35s ease; }
         .step-card h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem; }
         .step-card p { font-size: 0.9rem; color: var(--cl-muted); line-height: 1.7; margin: 0; transition: color 0.35s ease; }
 
-        .campaigns-section {
-            background: var(--cl-light);
-            transition: background-color 0.35s ease;
-        }
-        .campaign-card {
-            background: var(--cl-card-bg);
-            border: 1px solid var(--cl-card-border);
-            border-radius: var(--radius-xl);
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.35s ease, border-color 0.35s ease;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-        .campaign-card:hover {
-            transform: translateY(-6px);
-            box-shadow: var(--shadow-xl);
-            border-color: transparent;
-        }
-        .campaign-card-inner {
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-        }
-        .campaign-card-inner .cc-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-            background: var(--cl-blue-soft);
-            color: var(--cl-blue);
-            font-size: 0.7rem;
-            font-weight: 700;
-            padding: 0.3rem 0.65rem;
-            border-radius: var(--radius-full);
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            align-self: flex-start;
-            margin-bottom: 0.85rem;
-            transition: all 0.35s ease;
-        }
-        .campaign-card-inner h5 {
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            font-size: 1.02rem;
-            line-height: 1.4;
-            color: var(--cl-dark);
-            margin-bottom: 0.3rem;
-            transition: color 0.35s ease;
-        }
-        .campaign-card-inner .cc-org {
-            font-size: 0.82rem;
-            color: var(--cl-muted);
-            margin-bottom: 0;
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-            transition: color 0.35s ease;
-        }
+        .campaigns-section { background: var(--cl-light); transition: background-color 0.35s ease; }
+        .campaign-card { background: var(--cl-card-bg); border: 1px solid var(--cl-card-border); border-radius: var(--radius-xl); overflow: hidden; transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.35s ease, border-color 0.35s ease; height: 100%; display: flex; flex-direction: column; }
+        .campaign-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-xl); border-color: transparent; }
+        .campaign-card-inner { padding: 1.5rem; display: flex; flex-direction: column; flex: 1; }
+        .campaign-card-inner .cc-badge { display: inline-flex; align-items: center; gap: 0.3rem; background: var(--cl-blue-soft); color: var(--cl-blue); font-size: 0.7rem; font-weight: 700; padding: 0.3rem 0.65rem; border-radius: var(--radius-full); text-transform: uppercase; letter-spacing: 0.04em; align-self: flex-start; margin-bottom: 0.85rem; transition: all 0.35s ease; }
+        .campaign-card-inner h5 { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.02rem; line-height: 1.4; color: var(--cl-dark); margin-bottom: 0.3rem; transition: color 0.35s ease; }
+        .campaign-card-inner .cc-org { font-size: 0.82rem; color: var(--cl-muted); margin-bottom: 0; display: flex; align-items: center; gap: 0.35rem; transition: color 0.35s ease; }
         .campaign-card-inner .cc-org i { font-size: 0.7rem; color: var(--cl-green); }
-        .cc-footer {
-            margin-top: auto;
-            padding-top: 1.25rem;
-            border-top: 1px solid var(--cl-border);
-            transition: border-color 0.35s ease;
-        }
+        .cc-footer { margin-top: auto; padding-top: 1.25rem; border-top: 1px solid var(--cl-border); transition: border-color 0.35s ease; }
         .cc-progress { margin-bottom: 0.6rem; }
         .cc-progress .track { height: 6px; background: var(--cl-light); border-radius: var(--radius-full); overflow: hidden; transition: background 0.35s ease; }
         .cc-progress .bar { height: 6px; background: linear-gradient(90deg, var(--cl-red), #f87171); border-radius: var(--radius-full); position: relative; }
@@ -812,66 +259,30 @@
         .cc-raised { font-weight: 700; font-size: 1rem; color: var(--cl-dark); transition: color 0.35s ease; }
         .cc-goal { font-size: 0.8rem; color: var(--cl-muted); transition: color 0.35s ease; }
         .cc-goal strong { color: var(--cl-body); transition: color 0.35s ease; }
-        .btn-donate-card {
-            background: var(--cl-red); color: #fff; border: none; border-radius: var(--radius-full);
-            padding: 0.7rem 0; font-weight: 700; font-size: 0.9rem; width: 100%;
-            display: flex; align-items: center; justify-content: center; gap: 0.4rem;
-            transition: all 0.25s ease;
-        }
+        .btn-donate-card { background: var(--cl-red); color: #fff; border: none; border-radius: var(--radius-full); padding: 0.7rem 0; font-weight: 700; font-size: 0.9rem; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.4rem; transition: all 0.25s ease; }
         .btn-donate-card:hover { background: var(--cl-red-hover); color: #fff; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(230,57,70,0.3); }
         .campaigns-empty-state { text-align: center; padding: 4rem 2rem; }
         .campaigns-empty-state .empty-icon { width: 72px; height: 72px; background: var(--cl-light); border: 2px dashed var(--cl-border); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; transition: all 0.35s ease; }
         .campaigns-empty-state .empty-icon i { font-size: 1.75rem; color: var(--cl-border); }
         .campaigns-empty-state p { color: var(--cl-muted); font-size: 0.95rem; margin: 0; }
-        .btn-see-all {
-            background: var(--cl-card-bg); color: var(--cl-dark); border: 1.5px solid var(--cl-border);
-            border-radius: var(--radius-full); padding: 0.6rem 1.5rem; font-weight: 600; font-size: 0.875rem;
-            display: inline-flex; align-items: center; gap: 0.4rem; text-decoration: none;
-            transition: all 0.25s ease;
-        }
+        .btn-see-all { background: var(--cl-card-bg); color: var(--cl-dark); border: 1.5px solid var(--cl-border); border-radius: var(--radius-full); padding: 0.6rem 1.5rem; font-weight: 600; font-size: 0.875rem; display: inline-flex; align-items: center; gap: 0.4rem; text-decoration: none; transition: all 0.25s ease; }
         .btn-see-all:hover { border-color: var(--cl-red); color: var(--cl-red); transform: translateY(-1px); box-shadow: var(--shadow-md); }
 
         .chatbot-section { background: var(--cl-white); transition: background-color 0.35s ease; }
-        .chatbot-cta-card {
-            background: var(--cl-blue);
-            border-radius: var(--radius-xl);
-            position: relative;
-            overflow: hidden;
-        }
+        .chatbot-cta-card { background: var(--cl-blue); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
         .chatbot-cta-card::before { content: ''; position: absolute; top: -100px; right: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(230,57,70,0.12) 0%, transparent 60%); border-radius: 50%; pointer-events: none; }
         .chatbot-cta-card::after { content: ''; position: absolute; bottom: -60px; left: 30%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(45,198,83,0.08) 0%, transparent 60%); border-radius: 50%; pointer-events: none; }
         .chatbot-cta-card > * { position: relative; z-index: 1; }
         .chatbot-cta-card h2 { color: #fff; font-size: clamp(1.5rem, 3.5vw, 2.2rem); font-weight: 700; line-height: 1.2; margin-bottom: 0.75rem; }
         .chatbot-cta-card p { color: rgba(255,255,255,0.55); font-size: 1rem; line-height: 1.7; margin: 0; }
-        .btn-chatbot {
-            background: #fff; color: var(--cl-blue); border: none; border-radius: var(--radius-full);
-            padding: 0.85rem 2rem; font-weight: 700; font-size: 0.95rem;
-            display: inline-flex; align-items: center; gap: 0.6rem;
-            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        }
+        .btn-chatbot { background: #fff; color: var(--cl-blue); border: none; border-radius: var(--radius-full); padding: 0.85rem 2rem; font-weight: 700; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 0.6rem; transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
         .btn-chatbot:hover { transform: translateY(-3px); box-shadow: 0 10px 35px rgba(0,0,0,0.25); color: var(--cl-blue); }
         .btn-chatbot .robot-icon { font-size: 1.2rem; animation: float 3s ease-in-out infinite; }
 
         .actors-section { background: var(--cl-light); transition: background-color 0.35s ease; }
-        .actor-card {
-            background: var(--cl-card-bg);
-            border: 1px solid var(--cl-card-border);
-            border-radius: var(--radius-lg);
-            padding: 1.75rem 1.25rem;
-            text-align: center;
-            transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.35s ease, border-color 0.35s ease;
-            height: 100%;
-        }
+        .actor-card { background: var(--cl-card-bg); border: 1px solid var(--cl-card-border); border-radius: var(--radius-lg); padding: 1.75rem 1.25rem; text-align: center; transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.35s ease, border-color 0.35s ease; height: 100%; }
         .actor-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); border-color: var(--cl-red); }
-        .actor-card-icon {
-            width: 52px; height: 52px;
-            border-radius: var(--radius-md);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.35rem;
-            margin: 0 auto 1rem;
-            transition: transform 0.3s ease, background 0.35s ease;
-        }
+        .actor-card-icon { width: 52px; height: 52px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 1.35rem; margin: 0 auto 1rem; transition: transform 0.3s ease, background 0.35s ease; }
         .actor-card:hover .actor-card-icon { transform: scale(1.1); }
         .actor-icon-1 { background: var(--cl-red-soft); }
         .actor-icon-2 { background: var(--cl-blue-soft); }
@@ -899,9 +310,7 @@
         .footer-bottom { color: rgba(255,255,255,0.25); font-size: 0.8rem; }
         .footer-bottom .hl { color: rgba(255,255,255,0.5); }
 
-        @media (max-width: 1199.98px) {
-            .hero-float-badge { display: none !important; }
-        }
+        @media (max-width: 1199.98px) { .hero-float-badge { display: none !important; } }
         @media (max-width: 991.98px) {
             .hero-cards-col { margin-top: 3rem; }
             .hero-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
@@ -915,8 +324,7 @@
             .hero-title { font-size: 2rem; }
             .hero-desc { font-size: 0.95rem; }
             .hero-actions { flex-direction: column; }
-            .hero-actions .btn-hero-primary,
-            .hero-actions .btn-hero-secondary { width: 100%; justify-content: center; }
+            .hero-actions .btn-hero-primary, .hero-actions .btn-hero-secondary { width: 100%; justify-content: center; }
             .section-heading { font-size: 1.55rem; }
             .step-card { padding: 1.5rem 1.25rem; }
             .campaign-card-inner { padding: 1.25rem; }
@@ -941,20 +349,14 @@
                 <span class="nav-brand-name">Charity<span>Link</span></span>
             </a>
 
-            {{-- Mobile : dark toggle + lang switcher + burger --}}
             <div class="d-flex align-items-center gap-2 d-lg-none">
                 <button class="dark-toggle" id="darkToggleMobile" aria-label="Mode sombre">
                     <i class="bi bi-moon-stars-fill icon-moon"></i>
                     <i class="bi bi-sun-fill icon-sun"></i>
                 </button>
-                {{-- ✅ Language Switcher Mobile --}}
                 <div class="lang-switcher">
-                    <a href="{{ route('lang.switch', 'fr') }}"
-                       class="lang-btn {{ app()->getLocale() === 'fr' ? 'lang-btn--active' : '' }}"
-                       title="Français">🇫🇷</a>
-                    <a href="{{ route('lang.switch', 'en') }}"
-                       class="lang-btn {{ app()->getLocale() === 'en' ? 'lang-btn--active' : '' }}"
-                       title="English">🇬🇧</a>
+                    <a href="{{ route('lang.switch', 'fr') }}" class="lang-btn {{ app()->getLocale() === 'fr' ? 'lang-btn--active' : '' }}" title="Français">🇫🇷</a>
+                    <a href="{{ route('lang.switch', 'en') }}" class="lang-btn {{ app()->getLocale() === 'en' ? 'lang-btn--active' : '' }}" title="English">🇬🇧</a>
                 </div>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent" aria-controls="navContent" aria-expanded="false" aria-label="Menu">
                     <span class="navbar-toggler-icon"></span>
@@ -970,19 +372,13 @@
                     <li class="nav-item"><a class="nav-link" href="{{ route('chatbot.index') }}"><i class="bi bi-robot nav-icon-ai"></i> {{ __('Assistant IA') }}</a></li>
                 </ul>
                 <div class="d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2">
-                    {{-- Desktop : dark toggle --}}
                     <button class="dark-toggle d-none d-lg-flex" id="darkToggleDesktop" aria-label="Mode sombre">
                         <i class="bi bi-moon-stars-fill icon-moon"></i>
                         <i class="bi bi-sun-fill icon-sun"></i>
                     </button>
-                    {{-- ✅ Language Switcher Desktop --}}
                     <div class="lang-switcher d-none d-lg-flex">
-                        <a href="{{ route('lang.switch', 'fr') }}"
-                           class="lang-btn {{ app()->getLocale() === 'fr' ? 'lang-btn--active' : '' }}"
-                           title="Français">🇫🇷</a>
-                        <a href="{{ route('lang.switch', 'en') }}"
-                           class="lang-btn {{ app()->getLocale() === 'en' ? 'lang-btn--active' : '' }}"
-                           title="English">🇬🇧</a>
+                        <a href="{{ route('lang.switch', 'fr') }}" class="lang-btn {{ app()->getLocale() === 'fr' ? 'lang-btn--active' : '' }}" title="Français">🇫🇷</a>
+                        <a href="{{ route('lang.switch', 'en') }}" class="lang-btn {{ app()->getLocale() === 'en' ? 'lang-btn--active' : '' }}" title="English">🇬🇧</a>
                     </div>
                     @auth
                         <a href="{{ route('dashboard') }}" class="nav-btn-donate">{{ __('Dashboard') }} <i class="bi bi-arrow-right"></i></a>
@@ -1004,20 +400,24 @@
                 <div class="col-lg-6 hero-content mb-4 mb-lg-0">
                     <div class="hero-tag anim-fade-up">
                         <span class="pulse-dot"></span>
-                        🇹🇳 Plateforme Humanitaire Tunisienne
+                        🇹🇳 {{ __('Plateforme Humanitaire Tunisienne') }}
                     </div>
                     <h1 class="hero-title anim-fade-up-d1">
-                        La Solidarité,<br><span class="accent">Numérique</span><br>et Intelligente.
+                        @if(app()->getLocale() === 'en')
+                            Solidarity,<br><span class="accent">Digital</span><br>and Intelligent.
+                        @else
+                            La Solidarité,<br><span class="accent">Numérique</span><br>et Intelligente.
+                        @endif
                     </h1>
                     <p class="hero-desc anim-fade-up-d2">
-                        Charity-Link connecte donateurs, associations et bénévoles pour un impact humanitaire réel en Tunisie. Guidé par l'Intelligence Artificielle.
+                        {{ __("Charity-Link connecte donateurs, associations et bénévoles pour un impact humanitaire réel en Tunisie. Guidé par l'Intelligence Artificielle.") }}
                     </p>
                     <div class="hero-actions anim-fade-up-d3">
                         <a href="{{ route('campaigns.index') }}" class="btn-hero-primary">
                             <i class="bi bi-heart-fill"></i> {{ __('Faire un don') }}
                         </a>
                         <a href="{{ route('besoins.create') }}" class="btn-hero-secondary">
-                            <i class="bi bi-megaphone-fill"></i> J'ai besoin d'aide
+                            <i class="bi bi-megaphone-fill"></i> {{ __("J'ai besoin d'aide") }}
                         </a>
                     </div>
                     @php
@@ -1044,14 +444,14 @@
                 <div class="col-lg-5 offset-lg-1 hero-cards-col">
                     <div class="hero-float-badge badge-ai d-none d-xl-flex">
                         <div class="fb-icon fb-icon-blue"><i class="bi bi-stars" style="color:var(--cl-blue);"></i></div>
-                        Propulsé par l'IA
+                        {{ __("Propulsé par l'IA") }}
                     </div>
 
                     @php $heroCampaigns = \App\Models\Campaign::active()->with('association')->latest()->take(3)->get(); @endphp
                     @if($heroCampaigns->isEmpty())
                         <div class="hero-empty-state anim-fade-up-d2">
                             <div class="icon-wrap"><i class="bi bi-heart"></i></div>
-                            <p>Les premières campagnes arrivent bientôt.</p>
+                            <p>{{ __('Aucune campagne active pour le moment.') }}</p>
                         </div>
                     @else
                         @foreach($heroCampaigns as $hc)
@@ -1059,20 +459,46 @@
                             <div class="hero-card-badge">{{ ucfirst($hc->association->category ?? 'Humanitaire') }}</div>
                             <div class="hero-card-title">{{ Str::limit($hc->title, 52) }}</div>
                             <div class="hero-card-meta"><i class="bi bi-geo-alt-fill"></i> {{ $hc->association->name }} · {{ $hc->association->region }}</div>
-                            <div class="progress-bar-cl">
-                                <div class="bar" role="progressbar" style="width: {{ $hc->progressPercentage() }}%;" aria-valuenow="{{ $hc->progressPercentage() }}" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <div class="hero-card-stats">
-                                <span class="hero-card-amount">{{ number_format($hc->current_amount, 0) }} DT</span>
-                                <span class="hero-card-percent">{{ $hc->progressPercentage() }}%</span>
-                            </div>
+
+                            @php
+                                $hcNat = strtolower($hc->nature ?? '');
+                                $hcMonetaire = str_contains($hcNat, 'fond') || str_contains($hcNat, 'achat') || str_contains($hcNat, 'financ');
+                                $hcNature    = str_contains($hcNat, 'nature') || str_contains($hcNat, 'vêtement') || str_contains($hcNat, 'vetement') || str_contains($hcNat, 'aliment') || str_contains($hcNat, 'collecte');
+                            @endphp
+                            @if($hcMonetaire)
+                                <div class="progress-bar-cl">
+                                    <div class="bar" role="progressbar" style="width: {{ $hc->progressPercentage() }}%;" aria-valuenow="{{ $hc->progressPercentage() }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <div class="hero-card-stats">
+                                    <span class="hero-card-amount">{{ number_format($hc->current_amount, 0) }} DT</span>
+                                    <span class="hero-card-percent">{{ $hc->progressPercentage() }}%</span>
+                                </div>
+                            @elseif($hcNature)
+                                <div class="hero-card-stats mt-2">
+                                    <span class="hero-card-type-badge hero-card-type-badge--nature">
+                                        <i class="bi bi-box-seam-fill"></i> {{ __('Dons en nature') }}
+                                    </span>
+                                    <span class="hero-card-type-badge hero-card-type-badge--nature">
+                                        <span class="cc-active-dot"></span> {{ __('Actif') }}
+                                    </span>
+                                </div>
+                            @else
+                                <div class="hero-card-stats mt-2">
+                                    <span class="hero-card-type-badge hero-card-type-badge--benevole">
+                                        <i class="bi bi-people-fill"></i> {{ __('Bénévolat') }}
+                                    </span>
+                                    <span class="hero-card-type-badge hero-card-type-badge--benevole">
+                                        <span class="cc-active-dot"></span> {{ __('Actif') }}
+                                    </span>
+                                </div>
+                            @endif
                         </div>
                         @endforeach
                     @endif
 
                     <div class="hero-float-badge badge-trust d-none d-xl-flex">
                         <div class="fb-icon fb-icon-green"><i class="bi bi-patch-check-fill" style="color:var(--cl-green);"></i></div>
-                        Associations vérifiées
+                        {{ __('Associations vérifiées') }}
                     </div>
                 </div>
             </div>
@@ -1085,10 +511,10 @@
             <div class="row justify-content-center">
                 <div class="col-auto">
                     <div class="d-flex flex-wrap justify-content-center gap-4 gap-lg-5">
-                        <div class="trust-item"><i class="bi bi-shield-check"></i> Associations vérifiées</div>
-                        <div class="trust-item"><i class="bi bi-lock-fill"></i> Paiements sécurisés</div>
-                        <div class="trust-item"><i class="bi bi-eye-fill"></i> Transparence totale</div>
-                        <div class="trust-item"><i class="bi bi-people-fill"></i> 100% tunisien</div>
+                        <div class="trust-item"><i class="bi bi-shield-check"></i> {{ __('Associations vérifiées') }}</div>
+                        <div class="trust-item"><i class="bi bi-lock-fill"></i> {{ __('Paiements sécurisés') }}</div>
+                        <div class="trust-item"><i class="bi bi-eye-fill"></i> {{ __('Transparence totale') }}</div>
+                        <div class="trust-item"><i class="bi bi-people-fill"></i> {{ __('100% tunisien') }}</div>
                     </div>
                 </div>
             </div>
@@ -1099,33 +525,33 @@
     <section class="how-section py-5 py-lg-6">
         <div class="container py-4 py-lg-5">
             <div class="text-center mb-5">
-                <div class="section-eyebrow"><i class="bi bi-arrow-repeat"></i> Comment ça marche</div>
-                <h2 class="section-heading">Simple. Transparent. Impactant.</h2>
-                <p class="section-desc mx-auto">Trois étapes pour changer une vie en Tunisie.</p>
+                <div class="section-eyebrow"><i class="bi bi-arrow-repeat"></i> {{ __('Comment ça marche') }}</div>
+                <h2 class="section-heading">{{ __('Simple. Transparent. Impactant.') }}</h2>
+                <p class="section-desc mx-auto">{{ __('Trois étapes pour changer une vie en Tunisie.') }}</p>
             </div>
             <div class="row g-4">
                 <div class="col-md-4">
                     <div class="step-card">
                         <div class="step-card-icon step-icon-red">🔍</div>
-                        <div class="step-num">Étape 01</div>
-                        <h3>Découvrez</h3>
-                        <p>Parcourez les associations validées et les campagnes actives. Notre assistant IA vous guide vers la cause la plus adaptée à vos valeurs.</p>
+                        <div class="step-num">{{ __('Étape 01') }}</div>
+                        <h3>{{ __('Découvrez') }}</h3>
+                        <p>{{ __("Parcourez les associations validées et les campagnes actives. Notre assistant IA vous guide vers la cause la plus adaptée à vos valeurs.") }}</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="step-card">
                         <div class="step-card-icon step-icon-green">🤲</div>
-                        <div class="step-num">Étape 02</div>
-                        <h3>Contribuez</h3>
-                        <p>Don financier simulé, objets en nature (vêtements, médicaments…) ou partage de compétences professionnelles. Chaque geste compte.</p>
+                        <div class="step-num">{{ __('Étape 02') }}</div>
+                        <h3>{{ __('Contribuez') }}</h3>
+                        <p>{{ __("Don financier simulé, objets en nature ou partage de compétences professionnelles. Chaque geste compte.") }}</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="step-card">
                         <div class="step-card-icon step-icon-blue">📊</div>
-                        <div class="step-num">Étape 03</div>
-                        <h3>Suivez l'impact</h3>
-                        <p>Barres de progression en temps réel, tableau de bord personnalisé et notifications automatiques pour chaque étape de votre don.</p>
+                        <div class="step-num">{{ __('Étape 03') }}</div>
+                        <h3>{{ __("Suivez l'impact") }}</h3>
+                        <p>{{ __("Barres de progression en temps réel, tableau de bord personnalisé et notifications automatiques pour chaque étape de votre don.") }}</p>
                     </div>
                 </div>
             </div>
@@ -1137,7 +563,7 @@
         <div class="container py-4 py-lg-5">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-end mb-4 gap-3">
                 <div>
-                    <div class="section-eyebrow"><i class="bi bi-fire"></i> Campagnes actives</div>
+                    <div class="section-eyebrow"><i class="bi bi-fire"></i> {{ __('Campagnes actives') }}</div>
                     <h2 class="section-heading mb-0">{{ __('Soutenez les causes urgentes') }}</h2>
                 </div>
                 <a href="{{ route('campaigns.index') }}" class="btn-see-all flex-shrink-0">
@@ -1148,7 +574,7 @@
             @if($campaigns->isEmpty())
                 <div class="campaigns-empty-state">
                     <div class="empty-icon"><i class="bi bi-inbox"></i></div>
-                    <p>Aucune campagne active pour le moment.</p>
+                    <p>{{ __('Aucune campagne active pour le moment.') }}</p>
                 </div>
             @else
             <div class="row g-4">
@@ -1162,16 +588,43 @@
                             </div>
                             <h5>{{ Str::limit($campaign->title, 55) }}</h5>
                             <p class="cc-org"><i class="bi bi-buildings"></i> {{ $campaign->association->name }}</p>
+
                             <div class="cc-footer">
-                                <div class="cc-progress">
-                                    <div class="track">
-                                        <div class="bar" role="progressbar" style="width: {{ $campaign->progressPercentage() }}%;"></div>
+                                @php
+                                    $cNat = strtolower($campaign->nature ?? '');
+                                    $cMonetaire = str_contains($cNat, 'fond') || str_contains($cNat, 'achat') || str_contains($cNat, 'financ');
+                                    $cNature    = str_contains($cNat, 'nature') || str_contains($cNat, 'vêtement') || str_contains($cNat, 'vetement') || str_contains($cNat, 'aliment') || str_contains($cNat, 'collecte');
+                                @endphp
+                                @if($cMonetaire)
+                                    <div class="cc-progress">
+                                        <div class="track">
+                                            <div class="bar" role="progressbar" style="width: {{ $campaign->progressPercentage() }}%;"></div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="cc-amounts">
-                                    <span class="cc-raised">{{ number_format($campaign->current_amount, 0) }} DT</span>
-                                    <span class="cc-goal">{{ __('Objectif') }} : <strong>{{ number_format($campaign->goal_amount, 0) }} DT</strong> · {{ $campaign->progressPercentage() }}%</span>
-                                </div>
+                                    <div class="cc-amounts">
+                                        <span class="cc-raised">{{ number_format($campaign->current_amount, 0) }} DT</span>
+                                        <span class="cc-goal">{{ __('Objectif') }} : <strong>{{ number_format($campaign->goal_amount, 0) }} DT</strong> · {{ $campaign->progressPercentage() }}%</span>
+                                    </div>
+                                @elseif($cNature)
+                                    <div class="cc-amounts" style="margin-bottom: 0.85rem;">
+                                        <span class="cc-type-badge cc-type-badge--nature">
+                                            <i class="bi bi-box-seam-fill"></i> {{ __('Dons en nature') }}
+                                        </span>
+                                        <span class="cc-type-badge cc-type-badge--nature">
+                                            <span class="cc-active-dot"></span> {{ __('Campagne active') }}
+                                        </span>
+                                    </div>
+                                @else
+                                    <div class="cc-amounts" style="margin-bottom: 0.85rem;">
+                                        <span class="cc-type-badge cc-type-badge--benevole">
+                                            <i class="bi bi-people-fill"></i> {{ __('Bénévolat') }}
+                                        </span>
+                                        <span class="cc-type-badge cc-type-badge--benevole">
+                                            <span class="cc-active-dot"></span> {{ __('Campagne active') }}
+                                        </span>
+                                    </div>
+                                @endif
+
                                 <a href="{{ route('campaigns.show', $campaign) }}" class="btn-donate-card">
                                     <i class="bi bi-heart-fill"></i> {{ __('Contribuer') }}
                                 </a>
@@ -1192,7 +645,7 @@
                 <div class="row align-items-center">
                     <div class="col-lg-8 mb-3 mb-lg-0">
                         <h2>{{ __('Votre assistant solidaire') }}</h2>
-                        <p>Notre assistant IA analyse votre intention et vous recommande l'association tunisienne la plus adaptée. Gratuit, instantané, intelligent.</p>
+                        <p>{{ __("Notre assistant IA analyse votre intention et vous recommande l'association tunisienne la plus adaptée. Gratuit, instantané, intelligent.") }}</p>
                     </div>
                     <div class="col-lg-4 text-lg-end">
                         <a href="{{ route('chatbot.index') }}" class="btn-chatbot">
@@ -1209,50 +662,50 @@
     <section class="actors-section py-5 py-lg-6">
         <div class="container py-4 py-lg-5">
             <div class="text-center mb-5">
-                <div class="section-eyebrow"><i class="bi bi-diagram-3"></i> Notre écosystème</div>
-                <h2 class="section-heading">5 acteurs, 1 mission solidaire</h2>
+                <div class="section-eyebrow"><i class="bi bi-diagram-3"></i> {{ __('Notre écosystème') }}</div>
+                <h2 class="section-heading">{{ __('5 acteurs, 1 mission solidaire') }}</h2>
             </div>
             <div class="row g-3 g-lg-4 justify-content-center">
                 <div class="col-6 col-lg">
                     <div class="actor-card">
                         <div class="actor-card-icon actor-icon-1">💰</div>
                         <div class="actor-name">{{ __('Donateur') }}</div>
-                        <p class="actor-desc">Fait des dons financiers, en nature ou en compétences.</p>
+                        <p class="actor-desc">{{ __('Fait des dons financiers, en nature ou en compétences.') }}</p>
                     </div>
                 </div>
                 <div class="col-6 col-lg">
                     <div class="actor-card">
                         <div class="actor-card-icon actor-icon-2">🏢</div>
                         <div class="actor-name">{{ __('Association') }}</div>
-                        <p class="actor-desc">Publie des campagnes et gère les bénévoles.</p>
+                        <p class="actor-desc">{{ __('Publie des campagnes et gère les bénévoles.') }}</p>
                     </div>
                 </div>
                 <div class="col-6 col-lg">
                     <div class="actor-card">
                         <div class="actor-card-icon actor-icon-3">🛡️</div>
-                        <div class="actor-name">Administrateur</div>
-                        <p class="actor-desc">Valide les associations et modère la plateforme.</p>
+                        <div class="actor-name">{{ __('Administrateur') }}</div>
+                        <p class="actor-desc">{{ __('Valide les associations et modère la plateforme.') }}</p>
                     </div>
                 </div>
                 <div class="col-6 col-lg">
                     <div class="actor-card">
                         <div class="actor-card-icon actor-icon-4">🤝</div>
                         <div class="actor-name">{{ __('Bénévole') }}</div>
-                        <p class="actor-desc">Prend des tâches et offre ses compétences.</p>
+                        <p class="actor-desc">{{ __('Prend des tâches et offre ses compétences.') }}</p>
                     </div>
                 </div>
                 <div class="col-6 col-lg d-none d-lg-block">
                     <div class="actor-card">
                         <div class="actor-card-icon actor-icon-5">🆘</div>
-                        <div class="actor-name">Internaute</div>
-                        <p class="actor-desc">Déclare un besoin d'aide sans inscription.</p>
+                        <div class="actor-name">{{ __('Internaute') }}</div>
+                        <p class="actor-desc">{{ __("Déclare un besoin d'aide sans inscription.") }}</p>
                     </div>
                 </div>
                 <div class="col-12 d-lg-none">
                     <div class="actor-card">
                         <div class="actor-card-icon actor-icon-5">🆘</div>
-                        <div class="actor-name">Internaute</div>
-                        <p class="actor-desc">Déclare un besoin d'aide sans inscription.</p>
+                        <div class="actor-name">{{ __('Internaute') }}</div>
+                        <p class="actor-desc">{{ __("Déclare un besoin d'aide sans inscription.") }}</p>
                     </div>
                 </div>
             </div>
@@ -1271,11 +724,11 @@
                         <span class="footer-brand-name">Charity<span>Link</span></span>
                     </div>
                     <p class="footer-desc">
-                        Vers une Solidarité Numérique Intelligente au Service des Associations Tunisiennes.
+                        {{ __("Vers une Solidarité Numérique Intelligente au Service des Associations Tunisiennes.") }}
                     </p>
                 </div>
                 <div class="col-6 col-lg-3">
-                    <div class="footer-heading">Plateforme</div>
+                    <div class="footer-heading">{{ app()->getLocale() === 'en' ? 'Platform' : 'Plateforme' }}</div>
                     <ul class="footer-links">
                         <li><a href="{{ route('associations.index') }}"><i class="bi bi-chevron-right"></i> {{ __('Associations') }}</a></li>
                         <li><a href="{{ route('campaigns.index') }}"><i class="bi bi-chevron-right"></i> {{ __('Campagnes') }}</a></li>
@@ -1284,7 +737,7 @@
                     </ul>
                 </div>
                 <div class="col-6 col-lg-4">
-                    <div class="footer-heading">Actions</div>
+                    <div class="footer-heading">{{ app()->getLocale() === 'en' ? 'Actions' : 'Actions' }}</div>
                     <ul class="footer-links">
                         <li><a href="{{ route('register') }}"><i class="bi bi-chevron-right"></i> {{ __("S'inscrire") }}</a></li>
                         <li><a href="{{ route('login') }}"><i class="bi bi-chevron-right"></i> {{ __('Connexion') }}</a></li>
@@ -1294,7 +747,7 @@
             </div>
             <div class="footer-divider"></div>
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 footer-bottom">
-                <p class="mb-0">© {{ date('Y') }} <span class="hl">CharityLink</span> — Tous droits réservés</p>
+                <p class="mb-0">© {{ date('Y') }} <span class="hl">CharityLink</span> — {{ app()->getLocale() === 'en' ? 'All rights reserved' : 'Tous droits réservés' }}</p>
                 <p class="mb-0">Made with <span style="color:var(--cl-red);">♥</span> in Tunisia</p>
             </div>
         </div>
@@ -1332,9 +785,7 @@
                     entry.target.querySelectorAll('.bar').forEach(bar => {
                         const w = bar.style.width;
                         bar.style.width = '0%';
-                        requestAnimationFrame(() => {
-                            requestAnimationFrame(() => { bar.style.width = w; });
-                        });
+                        requestAnimationFrame(() => { requestAnimationFrame(() => { bar.style.width = w; }); });
                     });
                     observerBars.unobserve(entry.target);
                 }
